@@ -1,0 +1,23 @@
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:postgresql://localhost:5432/lounge_local_db
+    username: ${LOCAL_DB_USERNAME:postgres}
+    password: ${LOCAL_DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true # 줄바꿈, 들여쓰기
+        default_batch_fetch_size: 100 # 배치 사이즈, N+1 문제 완화용
+    open-in-view: false # OSIV 비활성화
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace # ? 파라미터 바인딩 값 

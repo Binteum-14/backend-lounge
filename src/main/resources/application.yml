@@ -1,0 +1,27 @@
+spring:
+  config:
+    import: optional:file:./.env[.properties]
+  application:
+    name: lounge
+  profiles:
+    active: local
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000 # 1시간
