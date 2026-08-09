@@ -2,13 +2,17 @@ spring:
   config:
     import: optional:file:./.env[.properties]
   application:
-    name: binteum
+    name: lounge
   profiles:
     active: local
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 6MB
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 springdoc:
   api-docs:
