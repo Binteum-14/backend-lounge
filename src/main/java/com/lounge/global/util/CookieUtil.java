@@ -7,13 +7,15 @@ import org.springframework.stereotype.Component;
 public class CookieUtil {
 
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-    private static final String COOKIE_PATH = "/api/auth";
+    private static final String GUEST_SESSION_COOKIE_NAME = "guestSessionId";
+    private static final String REFRESH_TOKEN_COOKIE_PATH = "/api/auth";
+    private static final String GUEST_SESSION_COOKIE_PATH = "/";
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken, long maxAgeSeconds) {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .httpOnly(true)
                 .secure(false)
-                .path(COOKIE_PATH)
+                .path(REFRESH_TOKEN_COOKIE_PATH)
                 .maxAge(maxAgeSeconds)
                 .sameSite("Lax")
                 .build();
@@ -23,7 +25,27 @@ public class CookieUtil {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(false)
-                .path(COOKIE_PATH)
+                .path(REFRESH_TOKEN_COOKIE_PATH)
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+    }
+
+    public ResponseCookie createGuestSessionCookie(String guestSessionId, long maxAgeSeconds) {
+        return ResponseCookie.from(GUEST_SESSION_COOKIE_NAME, guestSessionId)
+                .httpOnly(true)
+                .secure(false)
+                .path(GUEST_SESSION_COOKIE_PATH)
+                .maxAge(maxAgeSeconds)
+                .sameSite("Lax")
+                .build();
+    }
+
+    public ResponseCookie deleteGuestSessionCookie() {
+        return ResponseCookie.from(GUEST_SESSION_COOKIE_NAME, "")
+                .httpOnly(true)
+                .secure(false)
+                .path(GUEST_SESSION_COOKIE_PATH)
                 .maxAge(0)
                 .sameSite("Lax")
                 .build();

@@ -3,10 +3,12 @@ package com.lounge.domain.auth.controller;
 import com.lounge.domain.auth.dto.request.LoginRequest;
 import com.lounge.domain.auth.dto.request.SignupRequest;
 import com.lounge.domain.auth.dto.response.AuthTokenResult;
+import com.lounge.domain.auth.dto.response.GuestSessionResponse;
 import com.lounge.domain.auth.dto.response.TokenResponse;
 import com.lounge.domain.auth.dto.response.UsernameCheckResponse;
 import com.lounge.domain.auth.exception.code.AuthSuccessCode;
 import com.lounge.domain.auth.service.AuthService;
+import com.lounge.domain.auth.service.GuestSessionService;
 import com.lounge.global.api.ApiResponse;
 import com.lounge.global.config.properties.JwtProperties;
 import com.lounge.global.util.CookieUtil;
@@ -37,8 +39,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final GuestSessionService guestSessionService;
     private final CookieUtil cookieUtil;
     private final JwtProperties jwtProperties;
+
+    @Operation(summary = "게스트 세션 발급", description = "비로그인 사용자를 식별하기 위한 guestSessionId를 발급하거나 TTL을 갱신합니다.")
+    @PostMapping("/guest-session")
+    public ApiResponse<GuestSessionResponse> issueGuestSession(
+            @CookieValue(name = "guestSessionId", required = false) String guestSessionId,
+            HttpServletResponse response
+    ) {
+        GuestSessionResponse result = guestSessionService.issueOrRefresh(guestSessionId);
+        addGuestSessionCookie(response, result);
+
+        return ApiResponse.onSuccess(AuthSuccessCode.GUEST_SESSION_ISSUED_SUCCESS, result);
+    }
 
     @Operation(summary = "username 중복 확인", description = "회원가입 전에 username 사용 가능 여부를 확인합니다.")
     @GetMapping("/check-username")
@@ -65,10 +80,13 @@ public class AuthController {
     @PostMapping("/login")
     public ApiResponse<TokenResponse> login(
             @Valid @RequestBody LoginRequest request,
+            @CookieValue(name = "guestSessionId", required = false) String guestSessionId,
             HttpServletResponse response
     ) {
         AuthTokenResult result = authService.login(request);
+        guestSessionService.delete(guestSessionId);
         addRefreshTokenCookie(response, result.getRefreshToken());
+        deleteGuestSessionCookie(response);
 
         return ApiResponse.onSuccess(AuthSuccessCode.LOGIN_SUCCESS, result.toTokenResponse());
     }
@@ -122,5 +140,18 @@ public class AuthController {
         ResponseCookie refreshTokenCookie = cookieUtil.deleteRefreshTokenCookie();
         // 그걸 Set-Cookie 헤더를 응답에 넣기
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    private void addGuestSessionCookie(HttpServletResponse response, GuestSessionResponse result) {
+        ResponseCookie guestSessionCookie = cookieUtil.createGuestSessionCookie(
+                result.getGuestSessionId(),
+                result.getExpiresInSeconds()
+        );
+        response.addHeader(HttpHeaders.SET_COOKIE, guestSessionCookie.toString());
+    }
+
+    private void deleteGuestSessionCookie(HttpServletResponse response) {
+        ResponseCookie guestSessionCookie = cookieUtil.deleteGuestSessionCookie();
+        response.addHeader(HttpHeaders.SET_COOKIE, guestSessionCookie.toString());
     }
 }

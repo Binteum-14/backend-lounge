@@ -16,3 +16,6 @@ jwt:
   secret: test-jwt-secret-key-for-local-context-loading
   access-token-expiration: 3600000
   refresh-token-expiration: 1209600000
+
+guest-session:
+  expiration: 1800000
