@@ -2,7 +2,7 @@ package com.lounge.domain.auth.service;
 
 import com.lounge.domain.auth.dto.request.LoginRequest;
 import com.lounge.domain.auth.dto.request.SignupRequest;
-import com.lounge.domain.auth.dto.response.TokenResponse;
+import com.lounge.domain.auth.dto.response.AuthTokenResult;
 import com.lounge.domain.auth.dto.response.UsernameCheckResponse;
 import com.lounge.domain.auth.exception.code.AuthErrorCode;
 import com.lounge.domain.user.entity.User;
@@ -22,6 +22,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public UsernameCheckResponse checkUsername(String username) {
         boolean available = !userRepository.existsByUsername(username);
@@ -41,7 +42,7 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    public TokenResponse login(LoginRequest request) {
+    public AuthTokenResult login(LoginRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> GeneralException.of(AuthErrorCode.INVALID_CREDENTIALS));
 
@@ -49,11 +50,12 @@ public class AuthService {
             throw GeneralException.of(AuthErrorCode.INVALID_CREDENTIALS);
         }
 
-        return createTokenResponse(user);
+        return createAuthTokenResult(user);
     }
 
-    private TokenResponse createTokenResponse(User user) {
+    private AuthTokenResult createAuthTokenResult(User user) {
         String accessToken = jwtProvider.createAccessToken(user);
-        return TokenResponse.bearer(user.getId(), accessToken);
+        String refreshToken = refreshTokenService.issue(user).getToken();
+        return AuthTokenResult.of(user.getId(), accessToken, refreshToken);
     }
 }

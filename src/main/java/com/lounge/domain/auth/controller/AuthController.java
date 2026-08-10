@@ -2,16 +2,22 @@ package com.lounge.domain.auth.controller;
 
 import com.lounge.domain.auth.dto.request.LoginRequest;
 import com.lounge.domain.auth.dto.request.SignupRequest;
+import com.lounge.domain.auth.dto.response.AuthTokenResult;
 import com.lounge.domain.auth.dto.response.TokenResponse;
 import com.lounge.domain.auth.dto.response.UsernameCheckResponse;
 import com.lounge.domain.auth.exception.code.AuthSuccessCode;
 import com.lounge.domain.auth.service.AuthService;
 import com.lounge.global.api.ApiResponse;
+import com.lounge.global.config.properties.JwtProperties;
+import com.lounge.global.util.CookieUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final CookieUtil cookieUtil;
+    private final JwtProperties jwtProperties;
 
     @Operation(summary = "username 중복 확인", description = "회원가입 전에 username 사용 가능 여부를 확인합니다.")
     @GetMapping("/check-username")
@@ -53,8 +61,16 @@ public class AuthController {
     @Operation(summary = "로그인", description = "username/password를 검증하고 access token을 발급합니다.")
     @PostMapping("/login")
     public ApiResponse<TokenResponse> login(
-        @Valid @RequestBody LoginRequest request
+            @Valid @RequestBody LoginRequest request,
+            HttpServletResponse response
     ) {
-        return ApiResponse.onSuccess(AuthSuccessCode.LOGIN_SUCCESS, authService.login(request));
+        AuthTokenResult result = authService.login(request);
+        ResponseCookie refreshTokenCookie = cookieUtil.createRefreshTokenCookie(
+                result.getRefreshToken(),
+                jwtProperties.refreshTokenExpiration() / 1000
+        );
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+
+        return ApiResponse.onSuccess(AuthSuccessCode.LOGIN_SUCCESS, result.toTokenResponse());
     }
 }
