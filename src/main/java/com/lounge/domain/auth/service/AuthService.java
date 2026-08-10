@@ -3,6 +3,7 @@ package com.lounge.domain.auth.service;
 import com.lounge.domain.auth.dto.request.LoginRequest;
 import com.lounge.domain.auth.dto.request.SignupRequest;
 import com.lounge.domain.auth.dto.response.TokenResponse;
+import com.lounge.domain.auth.dto.response.UsernameCheckResponse;
 import com.lounge.domain.auth.exception.code.AuthErrorCode;
 import com.lounge.domain.user.entity.User;
 import com.lounge.domain.user.repository.UserRepository;
@@ -21,6 +22,11 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+
+    public UsernameCheckResponse checkUsername(String username) {
+        boolean available = !userRepository.existsByUsername(username);
+        return UsernameCheckResponse.of(available);
+    }
 
     @Transactional
     public void signup(SignupRequest request) {

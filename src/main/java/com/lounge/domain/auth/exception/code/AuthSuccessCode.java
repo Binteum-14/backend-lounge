@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum AuthSuccessCode implements BaseSuccessCode {
 
+    USERNAME_CHECK_SUCCESS(HttpStatus.OK, "AUTH_200_0", "username 중복 확인에 성공했습니다."),
     SIGNUP_SUCCESS(HttpStatus.CREATED, "AUTH_201_1", "회원가입에 성공했습니다."),
     LOGIN_SUCCESS(HttpStatus.OK, "AUTH_200_1", "로그인에 성공했습니다.");
 

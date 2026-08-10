@@ -63,7 +63,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
 
                                 "/api/auth/signup",
-                                "/api/auth/login"
+                                "/api/auth/login",
+                                "/api/auth/check-username"
 
 
                         ).permitAll()
