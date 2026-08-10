@@ -23,25 +23,23 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     @Transactional
-    public TokenResponse signup(SignupRequest request) {
-        if (userRepository.existsByUsername(request.username())) {
+    public void signup(SignupRequest request) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw GeneralException.of(AuthErrorCode.DUPLICATE_USERNAME);
         }
 
         User user = User.create(
-                request.username(),
-                passwordEncoder.encode(request.password())
+                request.getUsername(),
+                passwordEncoder.encode(request.getPassword())
         );
-        User savedUser = userRepository.save(user);
-
-        return createTokenResponse(savedUser);
+        userRepository.save(user);
     }
 
     public TokenResponse login(LoginRequest request) {
-        User user = userRepository.findByUsername(request.username())
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> GeneralException.of(AuthErrorCode.INVALID_CREDENTIALS));
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw GeneralException.of(AuthErrorCode.INVALID_CREDENTIALS);
         }
 

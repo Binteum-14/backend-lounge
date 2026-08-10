@@ -21,6 +21,11 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtProvider {
 
+    private static final String TOKEN_TYPE_CLAIM = "type";
+    private static final String TOKEN_ID_CLAIM = "jti";
+    private static final String ACCESS_TOKEN_TYPE = "ACCESS";
+    private static final String REFRESH_TOKEN_TYPE = "REFRESH";
+
     private final JwtProperties jwtProperties;
 
     private Key key;
@@ -34,16 +39,27 @@ public class JwtProvider {
     }
 
     public String createAccessToken(User user) {
-        return createToken(user, jwtProperties.accessTokenExpiration());
-    }
-
-    private String createToken(User user, Long expiration) {
         Date now = new Date();
-        Date expiredAt = new Date(now.getTime() + expiration);
+        Date expiredAt = new Date(now.getTime() + jwtProperties.accessTokenExpiration());
 
         return Jwts.builder()
                 .setSubject(String.valueOf(user.getId()))
+                .claim(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE)
                 .claim("username", user.getUsername())
+                .setIssuedAt(now)
+                .setExpiration(expiredAt)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String createRefreshToken(User user, String tokenId) {
+        Date now = new Date();
+        Date expiredAt = new Date(now.getTime() + jwtProperties.refreshTokenExpiration());
+
+        return Jwts.builder()
+                .setSubject(String.valueOf(user.getId()))
+                .claim(TOKEN_TYPE_CLAIM, REFRESH_TOKEN_TYPE)
+                .claim(TOKEN_ID_CLAIM, tokenId)
                 .setIssuedAt(now)
                 .setExpiration(expiredAt)
                 .signWith(key, SignatureAlgorithm.HS256)

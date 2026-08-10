@@ -25,8 +25,9 @@ public class AuthController {
 
     @Operation(summary = "회원가입", description = "username 중복을 확인하고 BCrypt로 password를 저장합니다.")
     @PostMapping("/signup")
-    public ApiResponse<TokenResponse> signup(@Valid @RequestBody SignupRequest request) {
-        return ApiResponse.onSuccess(AuthSuccessCode.SIGNUP_SUCCESS, authService.signup(request));
+    public ApiResponse<Void> signup(@Valid @RequestBody SignupRequest request) {
+        authService.signup(request);
+        return ApiResponse.onSuccess(AuthSuccessCode.SIGNUP_SUCCESS, null);
     }
 
     @Operation(summary = "로그인", description = "username/password를 검증하고 access token을 발급합니다.")
