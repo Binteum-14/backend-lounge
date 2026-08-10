@@ -40,6 +40,9 @@ public class SecurityConfig {
                 // Form Login 비활성화
                 .formLogin(formLogin -> formLogin.disable())
 
+                // HTTP Basic 인증 비활성화
+                .httpBasic(AbstractHttpConfigurer::disable)
+
                 // 세션 정책: STATELESS (JWT 기반)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
