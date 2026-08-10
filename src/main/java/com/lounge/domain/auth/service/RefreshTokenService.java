@@ -1,7 +1,9 @@
 package com.lounge.domain.auth.service;
 
+import com.lounge.domain.auth.exception.code.AuthErrorCode;
 import com.lounge.domain.user.entity.User;
 import com.lounge.global.config.properties.JwtProperties;
+import com.lounge.global.exception.GeneralException;
 import com.lounge.global.security.jwt.JwtProvider;
 import com.lounge.global.util.TokenHashUtil;
 import lombok.AccessLevel;
@@ -38,6 +40,20 @@ public class RefreshTokenService {
         );
 
         return IssuedRefreshToken.of(refreshToken);
+    }
+
+    public void validateStoredToken(Long userId, String tokenId, String refreshToken) {
+        String key = createKey(userId, tokenId);
+        String storedTokenHash = stringRedisTemplate.opsForValue().get(key);
+        String requestedTokenHash = tokenHashUtil.hash(refreshToken);
+
+        if (!requestedTokenHash.equals(storedTokenHash)) {
+            throw GeneralException.of(AuthErrorCode.INVALID_REFRESH_TOKEN);
+        }
+    }
+
+    public void delete(Long userId, String tokenId) {
+        stringRedisTemplate.delete(createKey(userId, tokenId));
     }
 
     private String createKey(Long userId, String tokenId) {

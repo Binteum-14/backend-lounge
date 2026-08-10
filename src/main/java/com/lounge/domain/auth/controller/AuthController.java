@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,12 +66,28 @@ public class AuthController {
             HttpServletResponse response
     ) {
         AuthTokenResult result = authService.login(request);
+        addRefreshTokenCookie(response, result.getRefreshToken());
+
+        return ApiResponse.onSuccess(AuthSuccessCode.LOGIN_SUCCESS, result.toTokenResponse());
+    }
+
+    @Operation(summary = "토큰 재발급", description = "refresh token cookie를 검증하고 access token을 재발급합니다.")
+    @PostMapping("/reissue")
+    public ApiResponse<TokenResponse> reissue(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        AuthTokenResult result = authService.reissue(refreshToken);
+        addRefreshTokenCookie(response, result.getRefreshToken());
+
+        return ApiResponse.onSuccess(AuthSuccessCode.TOKEN_REISSUE_SUCCESS, result.toTokenResponse());
+    }
+
+    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         ResponseCookie refreshTokenCookie = cookieUtil.createRefreshTokenCookie(
-                result.getRefreshToken(),
+                refreshToken,
                 jwtProperties.refreshTokenExpiration() / 1000
         );
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-
-        return ApiResponse.onSuccess(AuthSuccessCode.LOGIN_SUCCESS, result.toTokenResponse());
     }
 }

@@ -79,11 +79,24 @@ public class JwtProvider {
         }
     }
 
+    public void validateRefreshToken(String token) {
+        validateToken(token);
+
+        String tokenType = parseClaims(token).get(TOKEN_TYPE_CLAIM, String.class);
+        if (!REFRESH_TOKEN_TYPE.equals(tokenType)) {
+            throw new GeneralException(GeneralErrorCode.TOKEN_INVALID);
+        }
+    }
+
     public Long getUserId(String token) {
         // 토큰에서 userId 추출
         String subject = parseClaims(token).getSubject();
 
         return Long.valueOf(subject);
+    }
+
+    public String getTokenId(String token) {
+        return parseClaims(token).get(TOKEN_ID_CLAIM, String.class);
     }
 
     private Claims parseClaims(String token) {

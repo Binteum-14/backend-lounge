@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,25 @@ public class AuthService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw GeneralException.of(AuthErrorCode.INVALID_CREDENTIALS);
         }
+
+        return createAuthTokenResult(user);
+    }
+
+    public AuthTokenResult reissue(String refreshToken) {
+        if (!StringUtils.hasText(refreshToken)) {
+            throw GeneralException.of(AuthErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        jwtProvider.validateRefreshToken(refreshToken);
+
+        Long userId = jwtProvider.getUserId(refreshToken);
+        String tokenId = jwtProvider.getTokenId(refreshToken);
+
+        refreshTokenService.validateStoredToken(userId, tokenId, refreshToken);
+        refreshTokenService.delete(userId, tokenId);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> GeneralException.of(AuthErrorCode.INVALID_REFRESH_TOKEN));
 
         return createAuthTokenResult(user);
     }
