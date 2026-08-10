@@ -40,6 +40,9 @@ public class SecurityConfig {
                 // Form Login 비활성화
                 .formLogin(formLogin -> formLogin.disable())
 
+                // HTTP Basic 인증 비활성화
+                .httpBasic(AbstractHttpConfigurer::disable)
+
                 // 세션 정책: STATELESS (JWT 기반)
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -62,8 +65,12 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
 
+                                "/api/auth/guest-session",
                                 "/api/auth/signup",
-                                "/api/auth/login"
+                                "/api/auth/login",
+                                "/api/auth/reissue",
+                                "/api/auth/logout",
+                                "/api/auth/check-username"
 
 
                         ).permitAll()
