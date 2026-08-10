@@ -18,8 +18,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -83,11 +85,42 @@ public class AuthController {
         return ApiResponse.onSuccess(AuthSuccessCode.TOKEN_REISSUE_SUCCESS, result.toTokenResponse());
     }
 
+    @Operation(summary = "로그아웃", description = "refresh token을 Redis에서 삭제하고 refresh token cookie를 만료시킵니다.")
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse response
+    ) {
+        authService.logout(refreshToken);
+        deleteRefreshTokenCookie(response);
+
+        return ApiResponse.onSuccess(AuthSuccessCode.LOGOUT_SUCCESS, null);
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "인증된 사용자를 삭제하고 refresh token cookie를 만료시킵니다.")
+    @DeleteMapping("/withdraw")
+    public ApiResponse<Void> withdraw(
+            @AuthenticationPrincipal Long userId,
+            HttpServletResponse response
+    ) {
+        authService.withdraw(userId);
+        deleteRefreshTokenCookie(response);
+
+        return ApiResponse.onSuccess(AuthSuccessCode.WITHDRAW_SUCCESS, null);
+    }
+
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         ResponseCookie refreshTokenCookie = cookieUtil.createRefreshTokenCookie(
                 refreshToken,
                 jwtProperties.refreshTokenExpiration() / 1000
         );
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+    }
+
+    private void deleteRefreshTokenCookie(HttpServletResponse response) {
+        // Max-Age=0 인 쿠키를 만들어서 브라우저가 해당 쿠키 바로 삭제하도록
+        ResponseCookie refreshTokenCookie = cookieUtil.deleteRefreshTokenCookie();
+        // 그걸 Set-Cookie 헤더를 응답에 넣기
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -43,7 +44,8 @@ public class RefreshTokenService {
     }
 
     public void validateStoredToken(Long userId, String tokenId, String refreshToken) {
-        String key = createKey(userId, tokenId);
+        
+        String key = createKey(userId, tokenId); // redis에서 찾을 key 생성
         String storedTokenHash = stringRedisTemplate.opsForValue().get(key);
         String requestedTokenHash = tokenHashUtil.hash(refreshToken);
 
@@ -54,6 +56,15 @@ public class RefreshTokenService {
 
     public void delete(Long userId, String tokenId) {
         stringRedisTemplate.delete(createKey(userId, tokenId));
+    }
+
+    public void deleteAllByUserId(Long userId) {
+        Set<String> keys = stringRedisTemplate.keys(REFRESH_TOKEN_KEY_PREFIX + userId + ":*");
+        if (keys == null || keys.isEmpty()) {
+            return;
+        }
+
+        stringRedisTemplate.delete(keys);
     }
 
     private String createKey(Long userId, String tokenId) {
