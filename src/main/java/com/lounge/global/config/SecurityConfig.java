@@ -72,7 +72,8 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/check-username",
 
-                                "/api/products/**"
+                                "/api/products/**",
+                                "/api/focus/flights"
 
 
                         ).permitAll()
