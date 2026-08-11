@@ -72,7 +72,7 @@ public class SecurityConfig {
                                 "/api/auth/logout",
                                 "/api/auth/check-username",
 
-                                "/api/product/**"
+                                "/api/products/**"
 
 
                         ).permitAll()
