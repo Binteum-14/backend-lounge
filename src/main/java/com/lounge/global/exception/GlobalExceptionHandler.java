@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -61,6 +62,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             HttpServletRequest request)
     {
         return handleExceptionInternal(e, GeneralErrorCode.BAD_REQUEST, null, request);
+    }
+
+    // 잘못된 JSON 형식 또는 enum 값 오류
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ResponseEntity<Object> onHttpMessageNotReadableException(
+            HttpMessageNotReadableException e,
+            WebRequest request
+    ) {
+        return handleExceptionInternalFalse(
+                e,
+                GeneralErrorCode.BAD_REQUEST,
+                HttpHeaders.EMPTY,
+                GeneralErrorCode.BAD_REQUEST.getReason().getHttpStatus(),
+                request,
+                null
+        );
     }
 
     // MethodArgumentNotValidException
@@ -125,9 +142,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return super.handleExceptionInternal(e, body, headers, errorCode.getReason().getHttpStatus(), request);
     }
 
-    private ResponseEntity<Object> handleExceptionInternalConstraint(Exception e, BaseErrorCode errorCode,
-                                                                     HttpHeaders headers, WebRequest request) {
-        ApiResponse<Void> body = ApiResponse.onFailure(errorCode);
-        return super.handleExceptionInternal(e, body, headers, errorCode.getReason().getHttpStatus(), request);
-    }
 }
