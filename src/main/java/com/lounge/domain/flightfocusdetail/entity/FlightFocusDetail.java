@@ -44,4 +44,38 @@ public class FlightFocusDetail {
 
     @Column(name = "arrival_at")
     private LocalDateTime arrivalAt;
+
+    private FlightFocusDetail(
+            FocusRecord focusRecord,
+            String flightNumber,
+            String departureAirport,
+            String arrivalAirport,
+            LocalDateTime departureAt,
+            LocalDateTime arrivalAt
+    ) {
+        this.focusRecord = focusRecord;
+        this.flightNumber = flightNumber;
+        this.departureAirport = departureAirport;
+        this.arrivalAirport = arrivalAirport;
+        this.departureAt = departureAt;
+        this.arrivalAt = arrivalAt;
+    }
+
+    public static FlightFocusDetail create(
+            FocusRecord focusRecord,
+            String flightNumber,
+            String departureAirport,
+            String arrivalAirport,
+            LocalDateTime departureAt,
+            LocalDateTime arrivalAt
+    ) {
+        return new FlightFocusDetail(
+                focusRecord,
+                flightNumber,
+                departureAirport,
+                arrivalAirport,
+                departureAt,
+                arrivalAt
+        );
+    }
 }

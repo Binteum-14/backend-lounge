@@ -5,6 +5,8 @@ import com.lounge.domain.user.entity.User;
 import com.lounge.global.entity.CreatedAtEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,8 +35,9 @@ public class FocusRecord extends CreatedAtEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "theme_type")
-    private String themeType;
+    private FocusThemeType themeType;
 
     @Column(name = "all_minutes")
     private Integer allMinutes;
@@ -53,4 +56,42 @@ public class FocusRecord extends CreatedAtEntity {
 
     @OneToOne(mappedBy = "focusRecord", fetch = FetchType.LAZY)
     private FlightFocusDetail flightFocusDetail;
+
+    private FocusRecord(
+            User user,
+            FocusThemeType themeType,
+            Integer allMinutes,
+            Integer studySeconds,
+            Integer breakSeconds,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        this.user = user;
+        this.themeType = themeType;
+        this.allMinutes = allMinutes;
+        this.studySeconds = studySeconds;
+        this.breakSeconds = breakSeconds;
+        this.startedAt = startedAt;
+        this.endedAt = endedAt;
+    }
+
+    public static FocusRecord create(
+            User user,
+            FocusThemeType themeType,
+            Integer allMinutes,
+            Integer studySeconds,
+            Integer breakSeconds,
+            LocalDateTime startedAt,
+            LocalDateTime endedAt
+    ) {
+        return new FocusRecord(
+                user,
+                themeType,
+                allMinutes,
+                studySeconds,
+                breakSeconds,
+                startedAt,
+                endedAt
+        );
+    }
 }

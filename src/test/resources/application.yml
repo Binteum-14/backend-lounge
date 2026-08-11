@@ -19,3 +19,9 @@ jwt:
 
 guest-session:
   expiration: 1800000
+
+incheon-airport:
+  api:
+    base-url: https://apis.data.go.kr/B551177/StatusOfPassengerFlightsOdp
+    service-key: test-incheon-airport-service-key
+    cache-ttl: 3600000
