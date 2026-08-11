@@ -65,15 +65,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     // 잘못된 JSON 형식 또는 enum 값 오류
-    @ExceptionHandler(value = HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> onHttpMessageNotReadableException(
+    @Override
+    protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException e,
+            HttpHeaders headers,
+            HttpStatusCode status,
             WebRequest request
     ) {
         return handleExceptionInternalFalse(
                 e,
                 GeneralErrorCode.BAD_REQUEST,
-                HttpHeaders.EMPTY,
+                headers,
                 GeneralErrorCode.BAD_REQUEST.getReason().getHttpStatus(),
                 request,
                 null

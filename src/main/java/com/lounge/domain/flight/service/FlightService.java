@@ -33,6 +33,7 @@ public class FlightService {
     private static final int RECOMMENDATION_LIMIT = 5;
 
     private final IncheonAirportApiClient incheonAirportApiClient;
+    private final FlightDurationEstimator flightDurationEstimator;
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
 
@@ -87,7 +88,7 @@ public class FlightService {
 
     private Optional<FlightCandidate> toCandidate(IncheonAirportApiResponse item) {
         Optional<LocalTime> departureTime = parseTime(item.getScheduleDateTime());
-        Optional<Integer> durationMinutes = parseElapsedTime(item.getElapsetime());
+        Optional<Integer> durationMinutes = resolveDurationMinutes(item);
 
         if (departureTime.isEmpty() || durationMinutes.isEmpty()) {
             return Optional.empty();
@@ -101,6 +102,15 @@ public class FlightService {
                 departureTime.get(),
                 durationMinutes.get()
         ));
+    }
+
+    private Optional<Integer> resolveDurationMinutes(IncheonAirportApiResponse item) {
+        Optional<Integer> elapsedTime = parseElapsedTime(item.getElapsetime());
+        if (elapsedTime.isPresent()) {
+            return elapsedTime;
+        }
+
+        return flightDurationEstimator.estimateFromIncheon(item.getAirportCode());
     }
 
     private Optional<LocalTime> parseTime(String value) {
