@@ -73,7 +73,8 @@ public class SecurityConfig {
                                 "/api/auth/check-username",
 
                                 "/api/products/**",
-                                "/api/focus/flights"
+                                "/api/focus/flights",
+                                "/api/focus/snacks/**"
 
 
                         ).permitAll()
