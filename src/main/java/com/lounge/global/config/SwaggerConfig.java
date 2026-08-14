@@ -19,8 +19,8 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         Info apiInfo = new Info()
                 .version("v1.0.0")
-                .title("Binteum API")
-                .description("Binteum API Documentation");
+                .title("MCM Lounge API")
+                .description("MCM Lounge API Documentation");
 
         String jwtSchemeName = "BearerToken";
         SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
@@ -33,20 +33,18 @@ public class SwaggerConfig {
 
         Server localServer = new Server()
                 .url("http://localhost:8080")
-                .description("Binteum Local Server");
+                .description("MCM Lounge Local Server");
 
-        // 백엔드 서버 배포 후 수정 및 아래 리스트에 추가
-        /*Server httpServer = new Server()
-                .url("https://spring.issueissyu.cloud")
-                .description("IssueIssyu Prod Server");*/
+        Server httpServer = new Server()
+                .url("http://lounge-alb-54722381.ap-northeast-2.elb.amazonaws.com/")
+                .description("MCM Lounge Prod Server");
 
 
         return new OpenAPI()
                 .info(apiInfo)
                 .addSecurityItem(securityRequirement)
                 .components(components)
-                .servers(List.of(localServer));
-                //.servers(List.of(localServer, httpServer));
+                .servers(List.of(localServer, httpServer));
     }
 
     @Bean
