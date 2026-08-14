@@ -31,4 +31,9 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build and test
-        run: ./gradlew clean build --stacktrace --info
+        run: ./gradlew clean build
+
+      - name: Show test error only
+        if: failure()
+        run: |
+          grep -R -i -C 3 "placeholder" build/test-results/test/ || true
