@@ -2,9 +2,9 @@ spring:
   config:
     import: optional:file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://localhost:5432/lounge_local_db
-    username: ${LOCAL_DB_USERNAME:postgres}
-    password: ${LOCAL_DB_PASSWORD:}
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
