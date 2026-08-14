@@ -12,7 +12,7 @@ permissions:
 
 env:
   AWS_REGION: ap-northeast-2
-  S3_BUCKET: 실제-배포-버킷명
+  S3_BUCKET: lounge-backend-deploy-767397859048-ap-northeast-2-an
   CODEDEPLOY_APP: lounge-backend
   CODEDEPLOY_GROUP: lounge-deployment-group
 
@@ -36,7 +36,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          role-to-assume: arn:aws:iam::767397859048:role/lounge-github-actions-role
+          role-to-assume: arn:aws:iam::767397859048:role/lounge-github-deploy-policy
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Verify AWS identity
