@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:lounge-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        default_batch_fetch_size: 100
+    open-in-view: false
+
+jwt:
+  secret: test-jwt-secret-key-for-local-context-loading
+  access-token-expiration: 3600000
+  refresh-token-expiration: 1209600000
+
+guest-session:
+  expiration: 1800000
+
+incheon-airport:
+  api:
+    base-url: https://apis.data.go.kr/B551177/StatusOfPassengerFlightsOdp
+    service-key: test-incheon-airport-service-key
+    cache-ttl: 3600000
