@@ -1,6 +1,6 @@
 package com.lounge.domain.snack.service;
 
-import com.lounge.domain.product.entity.Product;
+import com.lounge.domain.product.entity.ProductVariant;
 import com.lounge.domain.snack.dto.response.SnackDetailResponse;
 import com.lounge.domain.snack.dto.response.SnackResponse;
 import com.lounge.domain.snack.entity.Snack;
@@ -36,11 +36,11 @@ public class SnackService {
         SnackSet snackSet = snackSetRepository.findBySnack_Id(snackId)
                 .orElseThrow(() -> SnackException.of(SnackErrorCode.SNACK_SET_NOT_FOUND));
 
-        Product product = snackSet.getProduct();
-        if (product == null) {
+        ProductVariant productVariant = snackSet.getProductVariant();
+        if (productVariant == null) {
             throw SnackException.of(SnackErrorCode.SNACK_PRODUCT_NOT_FOUND);
         }
 
-        return SnackDetailResponse.of(snack, product);
+        return SnackDetailResponse.of(snack, productVariant);
     }
 }

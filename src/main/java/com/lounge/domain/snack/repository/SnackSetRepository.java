@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface SnackSetRepository extends JpaRepository<SnackSet, Long> {
 
-    @EntityGraph(attributePaths = "product")
+    @EntityGraph(attributePaths = "productVariant")
     Optional<SnackSet> findBySnack_Id(Long snackId);
 }
