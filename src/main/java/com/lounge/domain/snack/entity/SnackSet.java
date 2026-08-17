@@ -1,6 +1,6 @@
 package com.lounge.domain.snack.entity;
 
-import com.lounge.domain.product.entity.Product;
+import com.lounge.domain.product.entity.ProductVariant;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,7 +28,7 @@ public class SnackSet {
     @JoinColumn(name = "snack_id", nullable = false, unique = true)
     private Snack snack;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_variant_id", nullable = false)
+    private ProductVariant productVariant;
 }
