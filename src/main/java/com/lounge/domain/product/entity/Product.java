@@ -5,6 +5,7 @@ import com.lounge.domain.visitpassproduct.entity.VisitPassProduct;
 import com.lounge.global.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +29,9 @@ public class Product extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
+    private String sku;
+
     private String name;
 
     private String category;
@@ -36,11 +41,17 @@ public class Product extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "detail_url")
+    @Column(name = "detail_url", columnDefinition = "TEXT")
     private String detailUrl;
 
     @Column(columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "product_feature", columnDefinition = "TEXT")
+    private String productFeature;
+
+    @Column(name = "care_guide", columnDefinition = "TEXT")
+    private String careGuide;
 
     @Column(name = "storage_score")
     private Integer storageScore;
@@ -54,20 +65,26 @@ public class Product extends BaseEntity {
     @Column(name = "commute_suitability_score")
     private Integer commuteSuitabilityScore;
 
-    @Column(name = "laptop_storage_grade")
-    private String laptopStorageGrade;
+    @Column(name = "laptop_storage_available")
+    private Boolean laptopStorageAvailable;
 
-    @Column(name = "cabin_suitability_grade")
-    private String cabinSuitabilityGrade;
+    @Column(name = "laptop_storage_score")
+    private Integer laptopStorageScore;
 
-    @Column(name = "waterproof_grade")
-    private String waterproofGrade;
+    @Column(name = "cabin_suitability_score")
+    private Integer cabinSuitabilityScore;
 
     private Boolean active;
 
-    @OneToMany(mappedBy = "product")
+    @Column(name = "source_collected_at")
+    private LocalDate sourceCollectedAt;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductVariant> variants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<RecommendationProduct> recommendationProducts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<VisitPassProduct> visitPassProducts = new ArrayList<>();
 }
