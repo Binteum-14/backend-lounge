@@ -36,7 +36,7 @@ public class SwaggerConfig {
                 .description("MCM Lounge Local Server");
 
         Server httpServer = new Server()
-                .url("http://lounge-alb-54722381.ap-northeast-2.elb.amazonaws.com/")
+                .url("https://dkcq9z3tgnp6t.cloudfront.net/")
                 .description("MCM Lounge Prod Server");
 
 
