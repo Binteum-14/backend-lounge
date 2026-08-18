@@ -31,3 +31,11 @@ openai:
   base-url: https://api.openai.com/v1
   model: ${OPENAI_MODEL:gpt-5.6-terra}
   max-output-tokens: 2500
+
+aws:
+  region: ap-northeast-2
+  s3:
+    bucket: test-lounge-bucket
+
+app:
+  public-url: http://localhost:8080

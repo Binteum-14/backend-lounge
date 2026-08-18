@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MCM Visit Pass</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #f4efe8; color: #3b2a1a; }
+        main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+        h1, h2 { margin: 0 0 12px; }
+        .meta { margin-bottom: 24px; }
+        .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .product img { width: 100%; border-radius: 8px; }
+        p { line-height: 1.6; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>MCM VISIT PASS</h1>
+    <section class="meta">
+        <p>Passenger: <strong th:text="${view.username()}">username</strong></p>
+        <p>Issued: <strong th:text="${#temporals.format(view.diagnosedAt(), 'yyyy.MM.dd')}">2026.08.03</strong></p>
+    </section>
+
+    <section th:if="${view.resultSummary() != null}">
+        <h2>진단 요약</h2>
+        <p th:text="${view.resultSummary()}">summary</p>
+    </section>
+
+    <section>
+        <h2>진단 답변</h2>
+        <article class="card" th:each="answer : ${view.answers()}">
+            <p th:text="'Q' + ${answer.questionNo()} + ' · ' + ${answer.questionCode()}">Q1</p>
+            <p th:text="${answer.answerText()}">answer</p>
+        </article>
+    </section>
+
+    <section>
+        <h2>추천 가방</h2>
+        <article class="card product" th:each="product : ${view.products()}">
+            <img th:if="${product.imageUrl() != null}" th:src="${product.imageUrl()}" alt="">
+            <h3 th:text="${product.rank()} + '. ' + ${product.name()}">name</h3>
+            <p th:text="${product.description()}">description</p>
+            <p th:text="${product.recommendationReason()}">reason</p>
+        </article>
+    </section>
+</main>
+</body>
+</html>
