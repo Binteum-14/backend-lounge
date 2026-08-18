@@ -12,9 +12,8 @@ public record VisitPassPublicView(
 ) {
 
     public record AnswerView(
-            Integer questionNo,
-            String questionCode,
-            String answerText
+            String questionDisplay,
+            String answerDisplay
     ) {
     }
 
@@ -22,8 +21,8 @@ public record VisitPassPublicView(
             Integer rank,
             String name,
             String imageUrl,
-            String description,
-            String recommendationReason
+            String recommendationReason,
+            boolean selected
     ) {
     }
 }

@@ -1,5 +1,6 @@
 package com.lounge.domain.visitpass.service;
 
+import com.lounge.domain.diagnosis.DiagnosisQuestionCatalog;
 import com.lounge.domain.diagnosis.entity.Diagnosis;
 import com.lounge.domain.diagnosisanswer.entity.DiagnosisAnswer;
 import com.lounge.domain.diagnosisanswer.repository.DiagnosisAnswerRepository;
@@ -122,10 +123,15 @@ public class VisitPassService {
                 .map(this::toAnswerView)
                 .toList();
 
+        Long selectedRecommendationProductId = visitPass.getRecommendationProduct().getId();
+
         List<ProductView> products = recommendationProductRepository
                 .findAllByRecommendation_IdOrderByRecommendationRankAsc(recommendation.getId())
                 .stream()
-                .map(this::toProductView)
+                .map(recommendationProduct -> toProductView(
+                        recommendationProduct,
+                        selectedRecommendationProductId
+                ))
                 .toList();
 
         return new VisitPassPublicView(
@@ -145,20 +151,27 @@ public class VisitPassService {
     }
 
     private AnswerView toAnswerView(DiagnosisAnswer answer) {
-        return new AnswerView(
+        String questionText = DiagnosisQuestionCatalog.questionText(
                 answer.getQuestionNo(),
-                answer.getQuestionCode(),
-                answer.getAnswerText()
+                answer.getQuestionCode()
         );
+        String answerText = answer.getAnswerText() == null || answer.getAnswerText().isBlank()
+                ? answer.getAnswerCode()
+                : answer.getAnswerText();
+
+        return new AnswerView(questionText, answerText);
     }
 
-    private ProductView toProductView(RecommendationProduct recommendationProduct) {
+    private ProductView toProductView(
+            RecommendationProduct recommendationProduct,
+            Long selectedRecommendationProductId
+    ) {
         return new ProductView(
                 recommendationProduct.getRecommendationRank(),
                 recommendationProduct.getProduct().getName(),
                 recommendationProduct.getProduct().getImageUrl(),
-                recommendationProduct.getProduct().getDescription(),
-                recommendationProduct.getRecommendationReason()
+                recommendationProduct.getRecommendationReason(),
+                recommendationProduct.getId().equals(selectedRecommendationProductId)
         );
     }
 }
