@@ -1,6 +1,7 @@
 package com.lounge.domain.product.dto.response;
 
 import com.lounge.domain.product.entity.Product;
+import com.lounge.domain.product.entity.ProductVariant;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,43 +9,20 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ProductResponse {
 
-    private Long id;
-    private String sku;
+    private String variantImageUrl;
     private String name;
-    private String category;
     private Long price;
-    private String imageUrl;
-    private String detailUrl;
     private String description;
-    private String productFeature;
-    private String careGuide;
-    private Integer storageScore;
-    private Integer versatilityScore;
-    private Integer travelSuitabilityScore;
-    private Integer commuteSuitabilityScore;
-    private Boolean laptopStorageAvailable;
-    private Integer laptopStorageScore;
-    private Integer cabinSuitabilityScore;
+    private String detailUrl;
 
-    public static ProductResponse from(Product product) {
+    public static ProductResponse from(ProductVariant productVariant) {
+        Product product = productVariant.getProduct();
         return new ProductResponse(
-                product.getId(),
-                product.getSku(),
+                productVariant.getImageUrl(),
                 product.getName(),
-                product.getCategory(),
-                product.getPrice(),
-                product.getImageUrl(),
-                product.getDetailUrl(),
+                productVariant.getPrice(),
                 product.getDescription(),
-                product.getProductFeature(),
-                product.getCareGuide(),
-                product.getStorageScore(),
-                product.getVersatilityScore(),
-                product.getTravelSuitabilityScore(),
-                product.getCommuteSuitabilityScore(),
-                product.getLaptopStorageAvailable(),
-                product.getLaptopStorageScore(),
-                product.getCabinSuitabilityScore()
+                productVariant.getDetailUrl()
         );
     }
 }

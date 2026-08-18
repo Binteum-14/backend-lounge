@@ -40,4 +40,16 @@ public class Recommendation extends CreatedAtEntity {
 
     @OneToMany(mappedBy = "recommendation")
     private List<RecommendationProduct> recommendationProducts = new ArrayList<>();
+
+    private Recommendation(User user, Diagnosis diagnosis) {
+        this.user = user;
+        this.diagnosis = diagnosis;
+    }
+
+    public static Recommendation create(
+            User user,
+            Diagnosis diagnosis
+    ) {
+        return new Recommendation(user, diagnosis);
+    }
 }
