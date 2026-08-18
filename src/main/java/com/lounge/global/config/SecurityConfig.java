@@ -77,7 +77,8 @@ public class SecurityConfig {
 
                                 "/api/products/**",
                                 "/api/focus/flights",
-                                "/api/focus/snacks/**"
+                                "/api/focus/snacks/**",
+                                "/visit-passes/public/**"
 
 
                         ).permitAll()

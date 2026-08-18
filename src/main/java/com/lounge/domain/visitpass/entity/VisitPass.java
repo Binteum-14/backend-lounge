@@ -1,5 +1,6 @@
 package com.lounge.domain.visitpass.entity;
 
+import com.lounge.domain.recommendationproduct.entity.RecommendationProduct;
 import com.lounge.domain.user.entity.User;
 import com.lounge.domain.visitpassproduct.entity.VisitPassProduct;
 import com.lounge.global.entity.CreatedAtEntity;
@@ -27,6 +28,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VisitPass extends CreatedAtEntity {
 
+    private static final String STATUS_ISSUED = "ISSUED";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,8 +38,12 @@ public class VisitPass extends CreatedAtEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "pass_code", unique = true)
-    private String passCode;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recommendation_product_id", nullable = false)
+    private RecommendationProduct recommendationProduct;
+
+    @Column(name = "pass_code", nullable = false, unique = true)
+    private String publicToken;
 
     @Column(name = "issued_date")
     private LocalDate issuedDate;
@@ -48,4 +55,35 @@ public class VisitPass extends CreatedAtEntity {
 
     @OneToMany(mappedBy = "visitPass")
     private List<VisitPassProduct> visitPassProducts = new ArrayList<>();
+
+    private VisitPass(
+            User user,
+            RecommendationProduct recommendationProduct,
+            String publicToken,
+            LocalDate issuedDate,
+            String qrCodeUrl
+    ) {
+        this.user = user;
+        this.recommendationProduct = recommendationProduct;
+        this.publicToken = publicToken;
+        this.issuedDate = issuedDate;
+        this.qrCodeUrl = qrCodeUrl;
+        this.status = STATUS_ISSUED;
+    }
+
+    public static VisitPass create(
+            User user,
+            RecommendationProduct recommendationProduct,
+            String publicToken,
+            LocalDate issuedDate,
+            String qrCodeUrl
+    ) {
+        return new VisitPass(
+                user,
+                recommendationProduct,
+                publicToken,
+                issuedDate,
+                qrCodeUrl
+        );
+    }
 }
