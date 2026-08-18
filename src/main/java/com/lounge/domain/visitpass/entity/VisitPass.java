@@ -42,7 +42,7 @@ public class VisitPass extends CreatedAtEntity {
     @JoinColumn(name = "recommendation_product_id", nullable = false)
     private RecommendationProduct recommendationProduct;
 
-    @Column(name = "pass_code", nullable = false, unique = true)
+    @Column(name = "public_token", nullable = false, unique = true)
     private String publicToken;
 
     @Column(name = "issued_date")
