@@ -14,16 +14,20 @@ public class FlightRecommendResponse {
     private String airline;
     private String departureAirportCode;
     private String departureAirportName;
+    private String departureAirportImageUrl;
     private String arrivalAirportCode;
     private String arrivalAirportName;
+    private String arrivalAirportImageUrl;
     private LocalTime departureTime;
     private Integer durationMinutes;
 
     public static FlightRecommendResponse of(
             String flightNumber,
             String airline,
+            String departureAirportImageUrl,
             String arrivalAirportCode,
             String arrivalAirportName,
+            String arrivalAirportImageUrl,
             LocalTime departureTime,
             Integer durationMinutes
     ) {
@@ -32,8 +36,10 @@ public class FlightRecommendResponse {
                 airline,
                 "ICN",
                 "인천",
+                departureAirportImageUrl,
                 arrivalAirportCode,
                 arrivalAirportName,
+                arrivalAirportImageUrl,
                 departureTime,
                 durationMinutes
         );

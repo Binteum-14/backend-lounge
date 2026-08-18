@@ -3,6 +3,7 @@ package com.lounge.domain.flight.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lounge.domain.flight.AirportLogoCatalog;
 import com.lounge.domain.flight.client.IncheonAirportApiClient;
 import com.lounge.domain.flight.dto.FlightRecommendResponse;
 import com.lounge.domain.flight.dto.IncheonAirportApiResponse;
@@ -49,8 +50,25 @@ public class FlightService {
                         .comparingInt((FlightCandidate candidate) -> candidate.durationDifference(focusMinutes))
                         .thenComparingInt(candidate -> candidate.departureTimeDifference(startTime)))
                 .limit(RECOMMENDATION_LIMIT)
-                .map(FlightCandidate::toResponse)
+                .map(this::toResponse)
                 .toList();
+    }
+
+    private FlightRecommendResponse toResponse(FlightCandidate candidate) {
+        return FlightRecommendResponse.of(
+                candidate.flightNumber,
+                candidate.airline,
+                resolveAirportImageUrl("ICN"),
+                candidate.arrivalAirportCode,
+                candidate.arrivalAirportName,
+                resolveAirportImageUrl(candidate.arrivalAirportCode),
+                candidate.departureTime,
+                candidate.durationMinutes
+        );
+    }
+
+    private String resolveAirportImageUrl(String airportCode) {
+        return AirportLogoCatalog.findImageUrl(airportCode).orElse(null);
     }
 
     private List<IncheonAirportApiResponse> getTodayDepartures() {
@@ -196,17 +214,6 @@ public class FlightService {
 
         private int durationDifference(int requestedDurationMinutes) {
             return Math.abs(durationMinutes - requestedDurationMinutes);
-        }
-
-        private FlightRecommendResponse toResponse() {
-            return FlightRecommendResponse.of(
-                    flightNumber,
-                    airline,
-                    arrivalAirportCode,
-                    arrivalAirportName,
-                    departureTime,
-                    durationMinutes
-            );
         }
     }
 }
