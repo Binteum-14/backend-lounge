@@ -4,46 +4,750 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MCM Visit Pass</title>
+
     <style>
-        body { margin: 0; font-family: sans-serif; background: #f4efe8; color: #3b2a1a; }
-        main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
-        h1, h2 { margin: 0 0 12px; }
-        .meta { margin-bottom: 24px; }
-        .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-        .product img { width: 100%; border-radius: 8px; }
-        p { line-height: 1.6; }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f4efe8;
+            color: #2d2118;
+            font-family:
+                    Pretendard,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    sans-serif;
+        }
+
+        main {
+            width: 100%;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 20px 16px 52px;
+        }
+
+        /* =========================
+           VISIT PASS
+        ========================= */
+
+        .visit-pass {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 36px;
+            padding: 28px 24px 24px;
+
+            background:
+                    radial-gradient(
+                            circle at 100% 50%,
+                            #f4efe8 0,
+                            #f4efe8 13px,
+                            transparent 14px
+                    ),
+                    radial-gradient(
+                            circle at 0 50%,
+                            #f4efe8 0,
+                            #f4efe8 13px,
+                            transparent 14px
+                    ),
+                    #fffaf3;
+
+            border: 1px solid #dac5a7;
+            border-radius: 22px;
+            box-shadow: 0 8px 24px rgba(69, 46, 27, 0.08);
+        }
+
+        .visit-pass::before {
+            content: "";
+            position: absolute;
+            left: 24px;
+            right: 24px;
+            top: 92px;
+            border-top: 1px dashed #cdae84;
+        }
+
+        .pass-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .pass-brand {
+            min-width: 0;
+        }
+
+        .pass-brand small {
+            display: block;
+            margin-bottom: 5px;
+
+            color: #a87838;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+        }
+
+        .pass-brand h1 {
+            margin: 0;
+
+            color: #2a1d14;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: clamp(32px, 8vw, 46px);
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+        }
+
+        .boarding-label {
+            flex-shrink: 0;
+            padding-top: 4px;
+
+            color: #a87838;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-align: right;
+        }
+
+        .boarding-label span {
+            display: block;
+            margin-top: 7px;
+            font-size: 20px;
+        }
+
+        .pass-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .pass-info-item {
+            min-width: 0;
+        }
+
+        .pass-info-item + .pass-info-item {
+            padding-left: 20px;
+            border-left: 1px solid #eadbc7;
+        }
+
+        .pass-info-label {
+            display: block;
+            margin-bottom: 7px;
+
+            color: #a87838;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+        }
+
+        .pass-info-value {
+            display: block;
+            overflow: hidden;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 21px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .pass-code {
+            margin-top: 22px;
+            padding-top: 13px;
+            border-top: 1px dashed #dac5a7;
+
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+
+            color: #8d6944;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+        }
+
+
+        /* =========================
+           SECTION
+        ========================= */
+
+        section {
+            margin-bottom: 34px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 15px;
+        }
+
+        .section-title-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 35px;
+            height: 35px;
+            flex-shrink: 0;
+
+            border-radius: 10px;
+            background: #342316;
+            color: #f6dfb8;
+
+            font-size: 17px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+            flex-shrink: 0;
+
+            color: #2b1d13;
+            font-family: Georgia, "Noto Serif KR", serif;
+            font-size: 23px;
+            letter-spacing: -0.04em;
+        }
+
+        .section-title-line {
+            width: 100%;
+            height: 1px;
+            background: #cda96f;
+        }
+
+
+        /* =========================
+           DIAGNOSIS
+        ========================= */
+
+        .answers {
+            overflow: hidden;
+            background: #fffdf9;
+            border: 1px solid #eadfce;
+            border-radius: 18px;
+            box-shadow: 0 5px 16px rgba(66, 43, 25, 0.05);
+        }
+
+        .qa {
+            padding: 20px;
+        }
+
+        .qa + .qa {
+            border-top: 1px dashed #decdb7;
+        }
+
+        .qa-question,
+        .qa-answer {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .qa-question {
+            margin-bottom: 13px;
+        }
+
+        .qa-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 38px;
+            height: 38px;
+
+            border-radius: 50%;
+            border: 1px solid #dfc398;
+
+            color: #9f6a27;
+            background: #fff9ef;
+
+            font-family: Georgia, serif;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .qa-answer .qa-badge {
+            background: #f5ead8;
+        }
+
+        .qa p {
+            margin: 6px 0 0;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        .qa-question p {
+            font-weight: 600;
+        }
+
+        .qa-answer p {
+            color: #604b39;
+        }
+
+
+        /* =========================
+           PRODUCT
+        ========================= */
+
+        .product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .product-card {
+            position: relative;
+            overflow: hidden;
+
+            background: #fffdf9;
+            border: 1px solid #e8dbc8;
+            border-radius: 20px;
+
+            box-shadow:
+                    0 7px 20px rgba(67, 42, 22, 0.07);
+        }
+
+        .product-rank {
+            position: absolute;
+            z-index: 2;
+            top: 0;
+            left: 18px;
+
+            min-width: 40px;
+            padding: 10px 9px 14px;
+
+            background: #af7c35;
+            color: #fff;
+
+            font-family: Georgia, serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+
+            border-radius: 0 0 8px 8px;
+        }
+
+        .product-image-wrap {
+            width: 100%;
+            aspect-ratio: 16 / 10;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #f7f0e6,
+                            #eee1cf
+                    );
+
+            overflow: hidden;
+        }
+
+        .product-image-wrap img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 18px;
+        }
+
+        .product-image-placeholder {
+            color: #bea78b;
+            font-size: 12px;
+            letter-spacing: 0.08em;
+        }
+
+        .product-content {
+            padding: 20px;
+        }
+
+        .product-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+
+            margin-bottom: 18px;
+        }
+
+        .product-label {
+            display: block;
+            margin-bottom: 6px;
+
+            color: #a87838;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+        }
+
+        .product-name {
+            margin: 0;
+
+            color: #2a1c13;
+            font-family: Georgia, "Noto Serif KR", serif;
+            font-size: 21px;
+            line-height: 1.35;
+            word-break: keep-all;
+        }
+
+        .product-number {
+            flex-shrink: 0;
+
+            color: #d6b681;
+            font-family: Georgia, serif;
+            font-size: 36px;
+            line-height: 1;
+        }
+
+        .reason {
+            position: relative;
+
+            padding: 16px 17px 16px 18px;
+
+            background: #f8f3eb;
+            border-radius: 13px;
+        }
+
+        .reason::before {
+            content: "";
+            position: absolute;
+            top: 16px;
+            bottom: 16px;
+            left: 0;
+
+            width: 3px;
+            border-radius: 3px;
+            background: #b4813f;
+        }
+
+        .reason-label {
+            margin: 0 0 7px;
+
+            color: #9d6c2e;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+        }
+
+        .reason-text {
+            margin: 0;
+
+            color: #594537;
+            font-size: 14px;
+            line-height: 1.7;
+            word-break: keep-all;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            margin-top: 42px;
+            text-align: center;
+            color: #9d774e;
+        }
+
+        .footer-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 10px;
+        }
+
+        .footer-line::before,
+        .footer-line::after {
+            content: "";
+            flex: 1;
+            border-top: 1px dashed #cbae85;
+        }
+
+        .footer-plane {
+            font-size: 16px;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 420px) {
+            main {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .visit-pass {
+                padding: 24px 20px 21px;
+            }
+
+            .pass-brand h1 {
+                font-size: 34px;
+            }
+
+            .pass-info-value {
+                font-size: 18px;
+            }
+
+            .section-title h2 {
+                font-size: 21px;
+            }
+
+            .product-content {
+                padding: 18px;
+            }
+        }
     </style>
 </head>
+
 <body>
+
 <main>
-    <h1>MCM VISIT PASS</h1>
-    <section class="meta">
-        <p>Passenger: <strong th:text="${view.username()}">username</strong></p>
-        <p>Issued: <strong th:text="${#temporals.format(view.diagnosedAt(), 'yyyy.MM.dd')}">2026.08.03</strong></p>
-    </section>
 
-    <section th:if="${view.resultSummary() != null}">
-        <h2>진단 요약</h2>
-        <p th:text="${view.resultSummary()}">summary</p>
-    </section>
+    <!-- =========================
+         VISIT PASS
+    ========================== -->
+    <header class="visit-pass">
 
+        <div class="pass-top">
+
+            <div class="pass-brand">
+                <small>MCM FOCUS LOUNGE</small>
+                <h1>
+                    MCM<br>
+                    VISIT PASS
+                </h1>
+            </div>
+
+            <div class="boarding-label">
+                BOARDING<br>
+                PASS
+                <span>✈</span>
+            </div>
+
+        </div>
+
+        <div class="pass-info">
+
+            <div class="pass-info-item">
+                <span class="pass-info-label">
+                    PASSENGER
+                </span>
+
+                <strong
+                        class="pass-info-value"
+                        th:text="${view.username()}">
+                    username
+                </strong>
+            </div>
+
+            <div class="pass-info-item">
+                <span class="pass-info-label">
+                    ISSUED
+                </span>
+
+                <strong
+                        class="pass-info-value"
+                        th:text="${#temporals.format(view.diagnosedAt(), 'yyyy.MM.dd')}">
+                    2026.08.03
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="pass-code">
+            <span>MCM VISIT EXPERIENCE</span>
+            <span>SEOUL · ICN</span>
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         진단 답변
+    ========================== -->
     <section>
-        <h2>진단 답변</h2>
-        <article class="card" th:each="answer : ${view.answers()}">
-            <p th:text="'Q' + ${answer.questionNo()} + ' · ' + ${answer.questionCode()}">Q1</p>
-            <p th:text="${answer.answerText()}">answer</p>
-        </article>
+
+        <div class="section-title">
+            <div class="section-title-icon">
+                ✓
+            </div>
+
+            <h2>진단 답변</h2>
+
+            <div class="section-title-line"></div>
+        </div>
+
+
+        <div class="answers">
+
+            <article
+                    class="qa"
+                    th:each="answer, answerStat : ${view.answers()}">
+
+                <div class="qa-question">
+
+                    <div
+                            class="qa-badge"
+                            th:text="'Q' + ${answerStat.count}">
+                        Q1
+                    </div>
+
+                    <p th:text="${answer.questionDisplay()}">
+                        질문
+                    </p>
+
+                </div>
+
+
+                <div class="qa-answer">
+
+                    <div
+                            class="qa-badge"
+                            th:text="'A' + ${answerStat.count}">
+                        A1
+                    </div>
+
+                    <p th:text="${answer.answerDisplay()}">
+                        답변
+                    </p>
+
+                </div>
+
+            </article>
+
+        </div>
+
     </section>
 
+
+    <!-- =========================
+         추천 가방
+    ========================== -->
     <section>
-        <h2>추천 가방</h2>
-        <article class="card product" th:each="product : ${view.products()}">
-            <img th:if="${product.imageUrl() != null}" th:src="${product.imageUrl()}" alt="">
-            <h3 th:text="${product.rank()} + '. ' + ${product.name()}">name</h3>
-            <p th:text="${product.description()}">description</p>
-            <p th:text="${product.recommendationReason()}">reason</p>
-        </article>
+
+        <div class="section-title">
+
+            <div class="section-title-icon">
+                ♢
+            </div>
+
+            <h2>추천 가방</h2>
+
+            <div class="section-title-line"></div>
+
+        </div>
+
+
+        <div class="product-list">
+
+            <article
+                    class="product-card"
+                    th:each="product : ${view.products()}">
+
+
+                <!-- 순위 -->
+                <div
+                        class="product-rank"
+                        th:text="${product.rank()}">
+                    1
+                </div>
+
+
+                <!-- 제품 이미지 -->
+                <div class="product-image-wrap">
+
+                    <img
+                            th:if="${product.imageUrl() != null}"
+                            th:src="${product.imageUrl()}"
+                            th:alt="${product.name()}">
+
+                    <span
+                            class="product-image-placeholder"
+                            th:if="${product.imageUrl() == null}">
+                        MCM PRODUCT
+                    </span>
+
+                </div>
+
+
+                <!-- 제품 정보 -->
+                <div class="product-content">
+
+                    <div class="product-head">
+
+                        <div>
+                            <span class="product-label">
+                                RECOMMENDED ITEM
+                            </span>
+
+                            <h3
+                                    class="product-name"
+                                    th:text="${product.name()}">
+                                MCM Bag
+                            </h3>
+                        </div>
+
+                        <span
+                                class="product-number"
+                                th:text="'0' + ${product.rank()}">
+                            01
+                        </span>
+
+                    </div>
+
+
+                    <!-- 가방별 추천 이유 -->
+                    <div class="reason">
+
+                        <p class="reason-label">
+                            WHY THIS BAG
+                        </p>
+
+                        <p
+                                class="reason-text"
+                                th:text="${product.recommendationReason()}">
+                            사용자의 라이프스타일과 취향을 고려했을 때
+                            가장 잘 어울리는 제품입니다.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
     </section>
+
+
+    <footer>
+
+        <div class="footer-line">
+            <span class="footer-plane">✈</span>
+        </div>
+
+        <p>
+            THANK YOU FOR VISITING MCM
+        </p>
+
+    </footer>
+
 </main>
+
 </body>
 </html>
