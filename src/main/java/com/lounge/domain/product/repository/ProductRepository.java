@@ -8,6 +8,8 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
+    List<Product> findAllByActiveTrue();
+
     List<Product> findTop3ByOrderByIdAsc();
 
     Optional<Product> findBySku(String sku);
