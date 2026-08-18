@@ -16,6 +16,7 @@ public class FlightRecommendResponse {
     private String departureAirportName;
     private String arrivalAirportCode;
     private String arrivalAirportName;
+    private String arrivalAirportImageUrl;
     private LocalTime departureTime;
     private Integer durationMinutes;
 
@@ -24,6 +25,7 @@ public class FlightRecommendResponse {
             String airline,
             String arrivalAirportCode,
             String arrivalAirportName,
+            String arrivalAirportImageUrl,
             LocalTime departureTime,
             Integer durationMinutes
     ) {
@@ -34,6 +36,7 @@ public class FlightRecommendResponse {
                 "인천",
                 arrivalAirportCode,
                 arrivalAirportName,
+                arrivalAirportImageUrl,
                 departureTime,
                 durationMinutes
         );
