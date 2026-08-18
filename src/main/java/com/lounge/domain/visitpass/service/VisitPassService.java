@@ -123,10 +123,15 @@ public class VisitPassService {
                 .map(this::toAnswerView)
                 .toList();
 
+        Long selectedRecommendationProductId = visitPass.getRecommendationProduct().getId();
+
         List<ProductView> products = recommendationProductRepository
                 .findAllByRecommendation_IdOrderByRecommendationRankAsc(recommendation.getId())
                 .stream()
-                .map(this::toProductView)
+                .map(recommendationProduct -> toProductView(
+                        recommendationProduct,
+                        selectedRecommendationProductId
+                ))
                 .toList();
 
         return new VisitPassPublicView(
@@ -157,12 +162,16 @@ public class VisitPassService {
         return new AnswerView(questionText, answerText);
     }
 
-    private ProductView toProductView(RecommendationProduct recommendationProduct) {
+    private ProductView toProductView(
+            RecommendationProduct recommendationProduct,
+            Long selectedRecommendationProductId
+    ) {
         return new ProductView(
                 recommendationProduct.getRecommendationRank(),
                 recommendationProduct.getProduct().getName(),
                 recommendationProduct.getProduct().getImageUrl(),
-                recommendationProduct.getRecommendationReason()
+                recommendationProduct.getRecommendationReason(),
+                recommendationProduct.getId().equals(selectedRecommendationProductId)
         );
     }
 }

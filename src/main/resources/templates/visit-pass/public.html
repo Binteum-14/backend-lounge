@@ -309,6 +309,28 @@
                     0 7px 20px rgba(67, 42, 22, 0.07);
         }
 
+        .product-card.is-picked {
+            border-color: #af7c35;
+            box-shadow: 0 8px 22px rgba(175, 124, 53, 0.18);
+        }
+
+        .product-pick-badge {
+            position: absolute;
+            z-index: 2;
+            top: 12px;
+            right: 12px;
+
+            padding: 7px 10px;
+
+            background: #2a1d14;
+            color: #f6dfb8;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            border-radius: 999px;
+        }
+
         .product-rank {
             position: absolute;
             z-index: 2;
@@ -656,6 +678,7 @@
 
             <article
                     class="product-card"
+                    th:classappend="${product.selected()} ? ' is-picked'"
                     th:each="product : ${view.products()}">
 
 
@@ -664,6 +687,12 @@
                         class="product-rank"
                         th:text="${product.rank()}">
                     1
+                </div>
+
+                <div
+                        class="product-pick-badge"
+                        th:if="${product.selected()}">
+                    YOUR PICK
                 </div>
 
 
@@ -690,7 +719,9 @@
                     <div class="product-head">
 
                         <div>
-                            <span class="product-label">
+                            <span
+                                    class="product-label"
+                                    th:text="${product.selected()} ? 'YOUR PICK' : 'RECOMMENDED ITEM'">
                                 RECOMMENDED ITEM
                             </span>
 

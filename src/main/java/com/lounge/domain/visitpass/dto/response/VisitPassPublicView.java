@@ -21,7 +21,8 @@ public record VisitPassPublicView(
             Integer rank,
             String name,
             String imageUrl,
-            String recommendationReason
+            String recommendationReason,
+            boolean selected
     ) {
     }
 }
