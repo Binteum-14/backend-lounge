@@ -40,3 +40,11 @@ openai:
   base-url: https://api.openai.com/v1
   model: ${OPENAI_MODEL:gpt-5.6-terra}
   max-output-tokens: 1500
+
+aws:
+  region: ${AWS_REGION:ap-northeast-2}
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+
+app:
+  public-url: ${BACKEND_PUBLIC_URL}
