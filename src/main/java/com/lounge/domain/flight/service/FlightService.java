@@ -58,7 +58,6 @@ public class FlightService {
         return FlightRecommendResponse.of(
                 candidate.flightNumber,
                 candidate.airline,
-                resolveAirportImageUrl("ICN"),
                 candidate.arrivalAirportCode,
                 candidate.arrivalAirportName,
                 resolveAirportImageUrl(candidate.arrivalAirportCode),

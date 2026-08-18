@@ -14,7 +14,6 @@ public class FlightRecommendResponse {
     private String airline;
     private String departureAirportCode;
     private String departureAirportName;
-    private String departureAirportImageUrl;
     private String arrivalAirportCode;
     private String arrivalAirportName;
     private String arrivalAirportImageUrl;
@@ -24,7 +23,6 @@ public class FlightRecommendResponse {
     public static FlightRecommendResponse of(
             String flightNumber,
             String airline,
-            String departureAirportImageUrl,
             String arrivalAirportCode,
             String arrivalAirportName,
             String arrivalAirportImageUrl,
@@ -36,7 +34,6 @@ public class FlightRecommendResponse {
                 airline,
                 "ICN",
                 "인천",
-                departureAirportImageUrl,
                 arrivalAirportCode,
                 arrivalAirportName,
                 arrivalAirportImageUrl,
