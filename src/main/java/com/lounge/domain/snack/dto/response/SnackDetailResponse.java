@@ -1,6 +1,6 @@
 package com.lounge.domain.snack.dto.response;
 
-import com.lounge.domain.product.entity.Product;
+import com.lounge.domain.product.entity.ProductVariant;
 import com.lounge.domain.snack.entity.Snack;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,10 +12,10 @@ public class SnackDetailResponse {
     private String snackImageUrl;
     private String productImageUrl;
 
-    public static SnackDetailResponse of(Snack snack, Product product) {
+    public static SnackDetailResponse of(Snack snack, ProductVariant productVariant) {
         return new SnackDetailResponse(
                 snack.getImageUrl(),
-                product.getImageUrl()
+                productVariant.getImageUrl()
         );
     }
 }

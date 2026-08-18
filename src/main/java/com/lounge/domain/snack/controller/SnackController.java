@@ -29,7 +29,7 @@ public class SnackController {
         return ApiResponse.onSuccess(SnackSuccessCode.SNACK_LIST_SUCCESS, snackService.getSnacks());
     }
 
-    @Operation(summary = "간식 주문하기", description = "선택한 간식과 연결된 MCM 제품 이미지 URL을 함께 조회합니다.")
+    @Operation(summary = "간식 주문하기", description = "선택한 간식과 연결된 MCM 제품 이미지 URL 함께 조회합니다.")
     @GetMapping("/{snackId}")
     public ApiResponse<SnackDetailResponse> getSnack(
             @PathVariable Long snackId
