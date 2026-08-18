@@ -30,6 +30,9 @@ jwt:
 guest-session:
   expiration: 1800000 # 30분
 
+presence:
+  expiration: 180000 # 3분
+
 incheon-airport:
   api:
     base-url: https://apis.data.go.kr/B551177/StatusOfPassengerFlightsOdp

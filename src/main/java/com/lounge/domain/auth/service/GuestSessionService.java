@@ -34,6 +34,15 @@ public class GuestSessionService {
         return GuestSessionResponse.of(resolvedSessionId, guestSessionExpiration / 1000);
     }
 
+    public boolean exists(String guestSessionId) {
+        if (!StringUtils.hasText(guestSessionId)) {
+            return false;
+        }
+        return Boolean.TRUE.equals(
+                stringRedisTemplate.hasKey(GUEST_SESSION_KEY_PREFIX + guestSessionId)
+        );
+    }
+
     public void delete(String guestSessionId) {
         if (!StringUtils.hasText(guestSessionId)) {
             return;
