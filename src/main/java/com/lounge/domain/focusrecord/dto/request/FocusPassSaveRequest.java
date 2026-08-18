@@ -35,11 +35,6 @@ public class FocusPassSaveRequest {
     @PositiveOrZero(message = "studySeconds는 0 이상이어야 합니다.")
     private Integer studySeconds;
 
-    @Schema(description = "휴식 시간입니다. 단위는 초입니다.", example = "900")
-    @NotNull(message = "breakSeconds는 필수입니다.")
-    @PositiveOrZero(message = "breakSeconds는 0 이상이어야 합니다.")
-    private Integer breakSeconds;
-
     @Schema(description = "집중 시작 시각입니다.", example = "2026-08-11T18:00:00")
     @NotNull(message = "startedAt은 필수입니다.")
     private LocalDateTime startedAt;

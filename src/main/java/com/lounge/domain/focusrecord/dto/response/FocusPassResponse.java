@@ -17,7 +17,6 @@ public class FocusPassResponse {
     private FocusThemeType themeType;
     private Integer allMinutes;
     private Integer studySeconds;
-    private Integer breakSeconds;
     private LocalDateTime startedAt;
     private LocalDateTime endedAt;
     private String flightNumber;
@@ -34,7 +33,6 @@ public class FocusPassResponse {
                 focusRecord.getThemeType(),
                 focusRecord.getAllMinutes(),
                 focusRecord.getStudySeconds(),
-                focusRecord.getBreakSeconds(),
                 focusRecord.getStartedAt(),
                 focusRecord.getEndedAt(),
                 flightFocusDetail == null ? null : flightFocusDetail.getFlightNumber(),
