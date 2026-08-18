@@ -41,4 +41,34 @@ public class RecommendationProduct {
 
     @Column(name = "recommendation_reason", columnDefinition = "TEXT")
     private String recommendationReason;
+
+    private RecommendationProduct(
+            Recommendation recommendation,
+            Product product,
+            Integer recommendationRank,
+            Integer matchScore,
+            String recommendationReason
+    ) {
+        this.recommendation = recommendation;
+        this.product = product;
+        this.recommendationRank = recommendationRank;
+        this.matchScore = matchScore;
+        this.recommendationReason = recommendationReason;
+    }
+
+    public static RecommendationProduct create(
+            Recommendation recommendation,
+            Product product,
+            Integer recommendationRank,
+            Integer matchScore,
+            String recommendationReason
+    ) {
+        return new RecommendationProduct(
+                recommendation,
+                product,
+                recommendationRank,
+                matchScore,
+                recommendationReason
+        );
+    }
 }
