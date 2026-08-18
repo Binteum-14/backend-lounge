@@ -23,8 +23,9 @@ public record AiRecommendationInput(
             Integer versatilityScore,
             Integer travelSuitabilityScore,
             Integer commuteSuitabilityScore,
-            String laptopStorageGrade,
-            String cabinSuitabilityGrade
+            Boolean laptopStorageAvailable,
+            Integer laptopStorageScore,
+            Integer cabinSuitabilityScore
     ) {
     }
 }

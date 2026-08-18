@@ -134,8 +134,9 @@ class OpenAiRecommendationClientTest {
                                 4,
                                 4,
                                 5,
-                                "가능",
-                                "적합"
+                                true,
+                                5,
+                                4
                         ),
                         new AiRecommendationInput.CandidateProduct(
                                 102L,
@@ -151,8 +152,9 @@ class OpenAiRecommendationClientTest {
                                 5,
                                 3,
                                 4,
-                                "조건부 가능",
-                                "적합"
+                                true,
+                                3,
+                                3
                         ),
                         new AiRecommendationInput.CandidateProduct(
                                 103L,
@@ -168,8 +170,9 @@ class OpenAiRecommendationClientTest {
                                 4,
                                 5,
                                 3,
-                                "불가능",
-                                "적합"
+                                false,
+                                1,
+                                5
                         )
                 )
         );

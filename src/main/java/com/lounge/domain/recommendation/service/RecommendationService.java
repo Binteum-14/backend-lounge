@@ -225,8 +225,9 @@ public class RecommendationService {
                                         product.getVersatilityScore(),
                                         product.getTravelSuitabilityScore(),
                                         product.getCommuteSuitabilityScore(),
-                                        product.getLaptopStorageGrade(),
-                                        product.getCabinSuitabilityGrade()
+                                        product.getLaptopStorageAvailable(),
+                                        product.getLaptopStorageScore(),
+                                        product.getCabinSuitabilityScore()
                                 )
                         )
                         .toList();
