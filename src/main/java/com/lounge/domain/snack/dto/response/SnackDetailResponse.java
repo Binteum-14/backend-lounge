@@ -9,11 +9,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public class SnackDetailResponse {
 
+    private Long productVariantId;
     private String snackImageUrl;
     private String productImageUrl;
 
     public static SnackDetailResponse of(Snack snack, ProductVariant productVariant) {
         return new SnackDetailResponse(
+                productVariant.getId(),
                 snack.getImageUrl(),
                 productVariant.getImageUrl()
         );

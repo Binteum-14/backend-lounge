@@ -5,6 +5,7 @@ import com.lounge.domain.product.dto.response.ProductResponse;
 import com.lounge.domain.product.exception.code.ProductSuccessCode;
 import com.lounge.domain.product.service.ProductService;
 import com.lounge.global.api.ApiResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +28,14 @@ public class ProductController {
         return ApiResponse.onSuccess(ProductSuccessCode.PRODUCT_LIST_SUCCESS, productService.getProducts());
     }
 
-    @GetMapping("/{productId}")
-    public ApiResponse<ProductResponse> getProduct(
-            @PathVariable Long productId
+    @Operation(summary = "상품 상세 조회", description = "productVariantId로 상품 상세(이미지, 이름, 가격, 설명, 상세 URL)를 조회합니다.")
+    @GetMapping("/{productVariantId}")
+    public ApiResponse<ProductResponse> getProductByVariantId(
+            @PathVariable Long productVariantId
     ) {
-        return ApiResponse.onSuccess(ProductSuccessCode.PRODUCT_DETAIL_SUCCESS, productService.getProduct(productId));
+        return ApiResponse.onSuccess(
+                ProductSuccessCode.PRODUCT_DETAIL_SUCCESS,
+                productService.getProductByVariantId(productVariantId)
+        );
     }
 }

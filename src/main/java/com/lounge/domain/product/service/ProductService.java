@@ -5,6 +5,7 @@ import com.lounge.domain.product.dto.response.ProductResponse;
 import com.lounge.domain.product.exception.ProductException;
 import com.lounge.domain.product.exception.code.ProductErrorCode;
 import com.lounge.domain.product.repository.ProductRepository;
+import com.lounge.domain.product.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
 
     public List<ProductListResponse> getProducts() {
         return productRepository.findTop3ByOrderByIdAsc().stream()
@@ -24,8 +26,8 @@ public class ProductService {
                 .toList();
     }
 
-    public ProductResponse getProduct(Long productId) {
-        return productRepository.findById(productId)
+    public ProductResponse getProductByVariantId(Long productVariantId) {
+        return productVariantRepository.findById(productVariantId)
                 .map(ProductResponse::from)
                 .orElseThrow(() -> ProductException.of(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
