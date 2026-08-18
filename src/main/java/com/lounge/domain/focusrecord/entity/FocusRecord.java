@@ -45,9 +45,6 @@ public class FocusRecord extends CreatedAtEntity {
     @Column(name = "study_seconds")
     private Integer studySeconds;
 
-    @Column(name = "break_seconds")
-    private Integer breakSeconds;
-
     @Column(name = "started_at")
     private LocalDateTime startedAt;
 
@@ -62,7 +59,6 @@ public class FocusRecord extends CreatedAtEntity {
             FocusThemeType themeType,
             Integer allMinutes,
             Integer studySeconds,
-            Integer breakSeconds,
             LocalDateTime startedAt,
             LocalDateTime endedAt
     ) {
@@ -70,7 +66,6 @@ public class FocusRecord extends CreatedAtEntity {
         this.themeType = themeType;
         this.allMinutes = allMinutes;
         this.studySeconds = studySeconds;
-        this.breakSeconds = breakSeconds;
         this.startedAt = startedAt;
         this.endedAt = endedAt;
     }
@@ -80,7 +75,6 @@ public class FocusRecord extends CreatedAtEntity {
             FocusThemeType themeType,
             Integer allMinutes,
             Integer studySeconds,
-            Integer breakSeconds,
             LocalDateTime startedAt,
             LocalDateTime endedAt
     ) {
@@ -89,7 +83,6 @@ public class FocusRecord extends CreatedAtEntity {
                 themeType,
                 allMinutes,
                 studySeconds,
-                breakSeconds,
                 startedAt,
                 endedAt
         );
