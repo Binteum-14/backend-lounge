@@ -68,12 +68,13 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
 
-                                "/api/auth/guest-session",
                                 "/api/auth/signup",
                                 "/api/auth/login",
                                 "/api/auth/reissue",
                                 "/api/auth/logout",
                                 "/api/auth/check-username",
+
+                                "/api/presence/heartbeat",
 
                                 "/api/products/**",
                                 "/api/focus/flights",
