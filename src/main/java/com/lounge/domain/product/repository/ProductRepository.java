@@ -11,4 +11,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findTop3ByOrderByIdAsc();
 
     Optional<Product> findBySku(String sku);
+
+    List<Product> findAllByActiveTrueOrderByNameAsc();
 }
