@@ -12,6 +12,7 @@ public record RecommendationResponse(
 
     public record RecommendedProductResponse(
 
+            Long recommendationProductId,
             Long productId,
             String name,
             String imageUrl,
