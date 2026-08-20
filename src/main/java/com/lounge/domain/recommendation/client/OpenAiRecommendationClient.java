@@ -9,6 +9,7 @@ import com.lounge.domain.recommendation.exception.RecommendationException;
 import com.lounge.domain.recommendation.exception.code.RecommendationErrorCode;
 import com.lounge.global.config.properties.OpenAiProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -16,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class OpenAiRecommendationClient {
@@ -198,10 +200,12 @@ public class OpenAiRecommendationClient {
             return result;
 
         } catch (RestClientException exception) {
+            log.error("OpenAI 추천 호출 실패", exception);
             throw RecommendationException.of(
                     RecommendationErrorCode.OPENAI_API_ERROR
             );
         } catch (JsonProcessingException exception) {
+            log.error("OpenAI 추천 응답 파싱 실패", exception);
             throw RecommendationException.of(
                     RecommendationErrorCode.OPENAI_INVALID_RESPONSE
             );
