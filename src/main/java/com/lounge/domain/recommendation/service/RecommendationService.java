@@ -166,27 +166,28 @@ public class RecommendationService {
                         })
                         .toList();
 
-        recommendationProductRepository.saveAll(
-                recommendationProducts
-        );
+        List<RecommendationProduct> savedRecommendationProducts =
+                recommendationProductRepository.saveAll(
+                        recommendationProducts
+                );
 
         List<RecommendedProductResponse> productResponses =
-                selectedProducts.stream()
-                        .map(selectedProduct -> {
-                            Product product = productMap.get(
-                                    selectedProduct.productId()
-                            );
+                savedRecommendationProducts.stream()
+                        .map(recommendationProduct -> {
+                            Product product =
+                                    recommendationProduct.getProduct();
 
                             return new RecommendedProductResponse(
+                                    recommendationProduct.getId(),
                                     product.getId(),
                                     product.getName(),
                                     product.getImageUrl(),
                                     product.getDetailUrl(),
-                                    selectedProduct.recommendationRank(),
-                                    selectedProduct.matchScore(),
-                                    recommendationReasonMap.get(
-                                            product.getId()
-                                    )
+                                    recommendationProduct
+                                            .getRecommendationRank(),
+                                    recommendationProduct.getMatchScore(),
+                                    recommendationProduct
+                                            .getRecommendationReason()
                             );
                         })
                         .toList();
