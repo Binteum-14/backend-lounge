@@ -73,7 +73,7 @@ public class VisitPassService {
         try {
             qrImageBytes = qrCodeGenerator.generatePng(qrTargetUrl);
         } catch (IllegalStateException e) {
-            log.error("QR 이미지 S3 업로드 실패", e);
+            log.error("QR 이미지 생성 실패. qrTargetUrl={}", qrTargetUrl, e);
             throw VisitPassException.of(VisitPassErrorCode.VISIT_PASS_QR_GENERATE_FAILED);
         }
 
@@ -81,6 +81,8 @@ public class VisitPassService {
         try {
             qrImageUrl = s3Service.uploadQrCode(qrImageBytes, objectKey);
         } catch (SdkException e) {
+            log.error("QR 이미지 S3 업로드 실패. objectKey={}, qrTargetUrl={}",
+                    objectKey, qrTargetUrl, e);
             throw VisitPassException.of(VisitPassErrorCode.VISIT_PASS_QR_UPLOAD_FAILED);
         }
 
