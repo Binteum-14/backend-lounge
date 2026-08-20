@@ -280,9 +280,12 @@ public class PackingXrayPreviewRenderer {
                 .filter(item -> !item.fit())
                 .map(item -> item.itemName() + " 제외 필요")
                 .findFirst()
-                .orElseGet(() -> response.scene().equals("flight")
-                        ? "Flight baggage profile"
-                        : "Lounge baggage profile");
+                .orElseGet(() -> switch (response.scene()) {
+                    case "perfume" -> "Perfume set bag profile";
+                    case "snack" -> "Snack and drink set bag profile";
+                    case "flight" -> "Flight baggage profile";
+                    default -> "Lounge baggage profile";
+                });
     }
 
     private void appendSpaceUsed(StringBuilder svg, PackingCheckResponse response) {

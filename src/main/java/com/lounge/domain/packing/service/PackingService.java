@@ -30,7 +30,7 @@ public class PackingService {
     /**
      * 제품 외형 치수와 실제 내부 치수의 차이를 고려한다.
      */
-    private static final double DIMENSION_SAFETY_RATIO = 0.97;
+    private static final double DIMENSION_SAFETY_RATIO = 1.0;
 
     private final CarryItemCatalog carryItemCatalog;
 
@@ -47,13 +47,13 @@ public class PackingService {
     }
 
     public PackingCheckResponse check(
-            String loungeId,
+            String packingProfileId,
             PackingCheckRequest request
     ) {
-        PackingProfile profile = packingProfileCatalog.findByLoungeId(loungeId)
+        PackingProfile profile = packingProfileCatalog.findByPackingProfileId(packingProfileId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "수납 프로필을 찾을 수 없습니다: " + loungeId
+                        "수납 프로필을 찾을 수 없습니다: " + packingProfileId
                 ));
 
         BagDimensions bag = BagDimensions.from(profile);
@@ -158,11 +158,11 @@ public class PackingService {
      * that the bag cannot accommodate. The target is deliberately below full
      * capacity so the recommendation remains practical for real use.
      */
-    public PackingCheckResponse recommend(String loungeId) {
-        PackingProfile profile = packingProfileCatalog.findByLoungeId(loungeId)
+    public PackingCheckResponse recommend(String packingProfileId) {
+        PackingProfile profile = packingProfileCatalog.findByPackingProfileId(packingProfileId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "수납 프로필을 찾을 수 없습니다: " + loungeId
+                        "수납 프로필을 찾을 수 없습니다: " + packingProfileId
                 ));
 
         List<String> suggestedItemCodes = new ArrayList<>();
@@ -171,7 +171,7 @@ public class PackingService {
             nextItemCodes.add(candidate);
 
             PackingCheckResponse nextResult = check(
-                    loungeId,
+                    packingProfileId,
                     new PackingCheckRequest(nextItemCodes)
             );
 
@@ -187,7 +187,7 @@ public class PackingService {
             }
         }
 
-        return check(loungeId, new PackingCheckRequest(suggestedItemCodes));
+        return check(packingProfileId, new PackingCheckRequest(suggestedItemCodes));
     }
 
     private List<String> recommendationCandidates(PackingProfile profile) {

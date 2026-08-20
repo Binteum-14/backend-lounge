@@ -41,7 +41,7 @@ public class PackingController {
 
     @Operation(
             summary = "수납 분석 지원 가방 목록 조회",
-            description = "현재 AI 수납 분석을 지원하는 라운지 L01~L07 및 비행기 F01~F07 가방 프로필을 조회합니다. imageUrl은 바로 표시할 수 있는 이미지 경로입니다."
+            description = "현재 AI 수납 분석을 지원하는 간식 L01~L07, 음료 F01~F07, 향수 P01~P07 가방 프로필을 조회합니다. imageUrl은 바로 표시할 수 있는 이미지 경로입니다."
     )
     @GetMapping("/profiles")
     public List<PackingProfile> getProfiles() {
@@ -50,9 +50,10 @@ public class PackingController {
     }
 
     @Operation(
-            summary = "라운지 가방 수납 가능성 분석",
+            summary = "수납 가방 분석 (기존 경로 호환)",
             description = """
-                    L01~L07 라운지 가방 ID와 사용자가 선택한 소지품을 기준으로
+                    기존 프론트 호환용 경로입니다. L01~L07, F01~F07 또는 P01~P07 프로필 ID와
+                    사용자가 선택한 소지품을 기준으로
                     공식 제품 치수, 기기 수납 지원 여부, 전체 예상 공간 사용률을 계산합니다.
                     결과에는 수납 적합도와 프론트 시각화용 배치 좌표가 포함됩니다.
                     """
@@ -71,6 +72,33 @@ public class PackingController {
                 loungeId,
                 request
         );
+    }
+
+    @Operation(
+            summary = "수납 가방 분석",
+            description = "메뉴 상세 응답의 packingProfileId를 그대로 넣어 선택한 소지품의 수납 가능 여부를 분석합니다."
+    )
+    @PostMapping("/profiles/{packingProfileId}/check")
+    public PackingCheckResponse checkPackingByProfileId(
+            @PathVariable String packingProfileId,
+            @Valid @RequestBody PackingCheckRequest request
+    ) {
+        return packingService.check(packingProfileId, request);
+    }
+
+    @Operation(
+            summary = "수납 가방 엑스레이 미리보기 생성",
+            description = "메뉴 상세 응답의 packingProfileId와 현재 체크된 소지품만 사용해 SVG 엑스레이 이미지를 생성합니다."
+    )
+    @PostMapping(value = "/profiles/{packingProfileId}/xray-preview", produces = "image/svg+xml")
+    public ResponseEntity<String> getXrayPreviewByProfileId(
+            @PathVariable String packingProfileId,
+            @Valid @RequestBody PackingCheckRequest request
+    ) {
+        PackingCheckResponse response = packingService.check(packingProfileId, request);
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("image/svg+xml"))
+                .body(packingXrayPreviewRenderer.render(response));
     }
 
     @Operation(

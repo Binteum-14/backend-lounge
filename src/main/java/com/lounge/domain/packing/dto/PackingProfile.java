@@ -43,6 +43,15 @@ public record PackingProfile(
         return widthCm * heightCm * depthCm;
     }
 
+    /**
+     * {@code loungeId}라는 옛 내부 이름을 호환성 때문에 유지한다.
+     * API 응답에서는 이 필드를 사용해야 한다.
+     */
+    @JsonProperty("packingProfileId")
+    public String getPackingProfileId() {
+        return loungeId;
+    }
+
     @JsonProperty("imageUrl")
     public String getImageUrl() {
         String staticPath = imagePath.startsWith("가방/")

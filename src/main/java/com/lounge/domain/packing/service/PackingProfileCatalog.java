@@ -43,6 +43,10 @@ public class PackingProfileCatalog {
         return findByKey(profilesByLoungeId, loungeId);
     }
 
+    public Optional<PackingProfile> findByPackingProfileId(String packingProfileId) {
+        return findByKey(profilesByLoungeId, packingProfileId);
+    }
+
     public Optional<PackingProfile> findBySku(String sku) {
         return findByKey(profilesBySku, sku);
     }

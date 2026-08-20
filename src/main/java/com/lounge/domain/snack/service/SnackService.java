@@ -44,22 +44,29 @@ public class SnackService {
         int menuOrder = getMenuOrder(snack);
         String loungePackingProfileId = "L%02d".formatted(menuOrder);
         String flightPackingProfileId = "F%02d".formatted(menuOrder);
+        String packingProfileId = switch (snack.getType()) {
+            case SNACK -> loungePackingProfileId;
+            case DRINK -> flightPackingProfileId;
+            case PERFUME -> "P%02d".formatted(menuOrder);
+        };
 
         return SnackDetailResponse.of(
                 snack,
                 productVariant,
+                packingProfileId,
                 loungePackingProfileId,
                 flightPackingProfileId
         );
     }
 
     /**
-     * The focus-mode dataset pairs drink, dessert, and fragrance menus by
-     * their order: each category's 1st item maps to L01/F01, and so on.
+     * 음료, 간식, 향수는 각각 독립된 메뉴 순서를 갖지만,
+     * 메뉴별로 같은 순번의 전용 수납 가방을 연결합니다.
+     * 간식은 L01~L07, 음료는 F01~F07, 향수는 P01~P07을 사용합니다.
      */
     private int getMenuOrder(Snack snack) {
         List<Snack> snacksOfSameType = snackRepository
-                .findByTypeOrderByIdAsc(snack.getType());
+                .findByTypeAndActiveTrueOrderByIdAsc(snack.getType());
 
         int index = snacksOfSameType.stream()
                 .map(Snack::getId)

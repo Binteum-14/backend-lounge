@@ -1,5 +1,6 @@
 package com.lounge.domain.packing.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lounge.domain.packing.PackingStatus;
 
 import java.util.List;
@@ -36,6 +37,15 @@ public record PackingCheckResponse(
 
         String sourceUrl
 ) {
+
+    /**
+     * 메뉴 상세 응답의 packingProfileId와 같은 값입니다.
+     * loungeId는 예전 응답 호환성을 위해 함께 유지합니다.
+     */
+    @JsonProperty("packingProfileId")
+    public String getPackingProfileId() {
+        return loungeId;
+    }
 
     public record BagSize(
             double widthMm,
