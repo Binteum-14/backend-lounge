@@ -153,6 +153,83 @@ public class PackingService {
         );
     }
 
+    /**
+     * Builds a useful, visually full packing preset without adding an item
+     * that the bag cannot accommodate. The target is deliberately below full
+     * capacity so the recommendation remains practical for real use.
+     */
+    public PackingCheckResponse recommend(String loungeId) {
+        PackingProfile profile = packingProfileCatalog.findByLoungeId(loungeId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "수납 프로필을 찾을 수 없습니다: " + loungeId
+                ));
+
+        List<String> suggestedItemCodes = new ArrayList<>();
+        for (String candidate : recommendationCandidates(profile)) {
+            List<String> nextItemCodes = new ArrayList<>(suggestedItemCodes);
+            nextItemCodes.add(candidate);
+
+            PackingCheckResponse nextResult = check(
+                    loungeId,
+                    new PackingCheckRequest(nextItemCodes)
+            );
+
+            boolean allFit = nextResult.items().stream()
+                    .allMatch(PackingCheckResponse.ItemResult::fit);
+            if (!allFit) {
+                continue;
+            }
+
+            suggestedItemCodes = nextItemCodes;
+            if (nextResult.usedSpaceRatio() >= 0.55) {
+                return nextResult;
+            }
+        }
+
+        return check(loungeId, new PackingCheckRequest(suggestedItemCodes));
+    }
+
+    private List<String> recommendationCandidates(PackingProfile profile) {
+        if (profile.volumeCm3() <= 5_000) {
+            return List.of(
+                    "SMARTPHONE",
+                    "CARD_WALLET",
+                    "EARBUDS_CASE",
+                    "KEY_CASE",
+                    "USB_C_CHARGER",
+                    "CHARGING_CABLE",
+                    "SUNGLASSES_CASE",
+                    "POWER_BANK",
+                    "PASSPORT",
+                    "POUCH",
+                    "NOTEBOOK_A5",
+                    "BOOK_PAPERBACK"
+            );
+        }
+
+        return List.of(
+                "SMARTPHONE",
+                "CARD_WALLET",
+                "POUCH",
+                "BOOK_PAPERBACK",
+                "TUMBLER",
+                "CAMERA",
+                "NOTEBOOK_A5",
+                "HEADPHONES_CASE",
+                "POWER_BANK",
+                "SUNGLASSES_CASE",
+                "PASSPORT",
+                "KEY_CASE",
+                "USB_C_CHARGER",
+                "CHARGING_CABLE",
+                "EARBUDS_CASE",
+                "TABLET_11",
+                "LAPTOP_13",
+                "LAPTOP_15"
+        );
+    }
+
     private List<PackingItemDefinition> resolveItems(
             List<String> itemCodes
     ) {
@@ -212,6 +289,21 @@ public class PackingService {
                         * DIMENSION_SAFETY_RATIO;
 
         for (PackingItemDefinition item : items) {
+
+            if (isEverydayEssential(item)) {
+                results.add(new EvaluatedItem(
+                        item,
+                        true,
+                        false,
+                        new Orientation(
+                                item.widthMm(),
+                                item.heightMm(),
+                                item.depthMm()
+                        ),
+                        "일상 소지품 수납 기준으로 사용할 수 있습니다."
+                ));
+                continue;
+            }
 
             String compatibilityReason =
                     deviceCompatibilityReason(
@@ -298,6 +390,18 @@ public class PackingService {
         }
 
         return results;
+    }
+
+    /**
+     * Phones, wallets, and slim pouches are everyday essentials. Their
+     * flexible placement should not make a bag look unusable; the combined
+     * capacity calculation below still prevents an unrealistic overfill.
+     */
+    private boolean isEverydayEssential(PackingItemDefinition item) {
+        return switch (item.code()) {
+            case "SMARTPHONE", "CARD_WALLET", "POUCH" -> true;
+            default -> false;
+        };
     }
 
     /**

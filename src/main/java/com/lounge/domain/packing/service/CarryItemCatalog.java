@@ -20,10 +20,10 @@ public class CarryItemCatalog {
                 "SMARTPHONE",
                 "스마트폰",
                 "DIGITAL",
-                78,
-                162,
+                75,
+                150,
                 9,
-                "일반 대형 스마트폰 기준"
+                "일반 스마트폰 기준"
         ));
 
         register(new PackingItemDefinition(
@@ -40,10 +40,10 @@ public class CarryItemCatalog {
                 "POUCH",
                 "파우치",
                 "DAILY",
-                190,
-                120,
-                60,
-                "일반 화장품 파우치 기준"
+                150,
+                90,
+                35,
+                "슬림 데일리 파우치 기준"
         ));
 
         register(new PackingItemDefinition(

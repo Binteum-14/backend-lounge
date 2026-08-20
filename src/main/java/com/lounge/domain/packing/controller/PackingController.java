@@ -74,6 +74,28 @@ public class PackingController {
     }
 
     @Operation(
+            summary = "AI 추천 구성 엑스레이 미리보기 생성",
+            description = "가방 크기에 맞춰 실제로 수납 가능한 대표 소지품을 추천 구성으로 채운 SVG 이미지를 반환합니다."
+    )
+    @PostMapping(
+            value = "/lounge/{loungeId}/recommended-xray-preview",
+            produces = "image/svg+xml"
+    )
+    public ResponseEntity<String> getRecommendedXrayPreview(
+
+            @PathVariable String loungeId
+    ) {
+
+        PackingCheckResponse response = packingService.recommend(
+                loungeId
+        );
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.valueOf("image/svg+xml"))
+                .body(packingXrayPreviewRenderer.render(response));
+    }
+
+    @Operation(
             summary = "AI 엑스레이 수납 미리보기 생성",
             description = "선택한 소지품의 실제 수납 분석 결과를 가방 안 배치로 표현한 SVG 이미지를 반환합니다."
     )
