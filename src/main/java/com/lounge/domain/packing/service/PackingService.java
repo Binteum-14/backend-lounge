@@ -4,8 +4,7 @@ import com.lounge.domain.packing.PackingStatus;
 import com.lounge.domain.packing.dto.PackingCheckRequest;
 import com.lounge.domain.packing.dto.PackingCheckResponse;
 import com.lounge.domain.packing.dto.PackingItemDefinition;
-import com.lounge.domain.product.entity.Product;
-import com.lounge.domain.product.repository.ProductRepository;
+import com.lounge.domain.packing.dto.PackingProfile;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -33,68 +32,58 @@ public class PackingService {
      */
     private static final double DIMENSION_SAFETY_RATIO = 0.97;
 
-    private final ProductRepository productRepository;
-
     private final CarryItemCatalog carryItemCatalog;
 
-    private final ProductDimensionExtractor dimensionExtractor;
+    private final PackingProfileCatalog packingProfileCatalog;
+
+    private final PackingLayoutEngine packingLayoutEngine;
 
     public List<PackingItemDefinition> getAvailableItems() {
         return carryItemCatalog.findAll();
     }
 
+    public List<PackingProfile> getAvailableProfiles() {
+        return packingProfileCatalog.findAll();
+    }
+
     public PackingCheckResponse check(
-            Long productId,
+            String loungeId,
             PackingCheckRequest request
     ) {
+        PackingProfile profile = packingProfileCatalog.findByLoungeId(loungeId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "수납 프로필을 찾을 수 없습니다: " + loungeId
+                ));
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND,
-                                "제품을 찾을 수 없습니다."
-                        )
-                );
-
-        ProductDimensionExtractor.BagDimensions bag =
-                dimensionExtractor.extract(product)
-                        .orElse(null);
-
-        if (bag == null) {
-
-            return new PackingCheckResponse(
-                    product.getId(),
-                    product.getName(),
-                    product.getImageUrl(),
-                    PackingStatus.PROFILE_UNAVAILABLE,
-                    0,
-                    0.0,
-                    null,
-                    List.of(),
-                    List.of(),
-                    "제품 데이터에서 크기 정보를 찾지 못했습니다."
-            );
-        }
+        BagDimensions bag = BagDimensions.from(profile);
 
         List<PackingItemDefinition> selectedItems =
                 resolveItems(request.itemCodes());
 
-        List<EvaluatedItem> evaluatedItems =
+        List<EvaluatedItem> dimensionEvaluatedItems =
                 evaluateItems(
                         selectedItems,
+                        profile,
                         bag
                 );
-
-        double totalItemVolume =
-                selectedItems.stream()
-                        .mapToDouble(
-                                PackingItemDefinition::volume
-                        )
-                        .sum();
 
         double usableBagVolume =
                 bag.volume()
                         * USABLE_VOLUME_RATIO;
+
+        List<EvaluatedItem> evaluatedItems =
+                applyCombinedCapacity(
+                        dimensionEvaluatedItems,
+                        usableBagVolume
+                );
+
+        double totalItemVolume =
+                evaluatedItems.stream()
+                        .filter(EvaluatedItem::fit)
+                        .map(EvaluatedItem::item)
+                        .mapToDouble(PackingItemDefinition::volume)
+                        .sum();
 
         double usedSpaceRatio =
                 usableBagVolume <= 0
@@ -142,9 +131,13 @@ public class PackingService {
                 );
 
         return new PackingCheckResponse(
-                product.getId(),
-                product.getName(),
-                product.getImageUrl(),
+                profile.loungeId(),
+                profile.scene(),
+                profile.sku(),
+                profile.productName(),
+                profile.color(),
+                profile.imagePath(),
+                profile.getImageUrl(),
                 status,
                 fitScore,
                 round(usedSpaceRatio),
@@ -155,7 +148,8 @@ public class PackingService {
                 ),
                 itemResults,
                 placements,
-                buildNotice(status)
+                buildNotice(status),
+                profile.sourceUrl()
         );
     }
 
@@ -198,7 +192,8 @@ public class PackingService {
 
     private List<EvaluatedItem> evaluateItems(
             List<PackingItemDefinition> items,
-            ProductDimensionExtractor.BagDimensions bag
+            PackingProfile profile,
+            BagDimensions bag
     ) {
 
         List<EvaluatedItem> results =
@@ -217,6 +212,27 @@ public class PackingService {
                         * DIMENSION_SAFETY_RATIO;
 
         for (PackingItemDefinition item : items) {
+
+            String compatibilityReason =
+                    deviceCompatibilityReason(
+                            item,
+                            profile
+                    );
+
+            if (compatibilityReason != null) {
+
+                results.add(
+                        new EvaluatedItem(
+                                item,
+                                false,
+                                false,
+                                null,
+                                compatibilityReason
+                        )
+                );
+
+                continue;
+            }
 
             Orientation orientation =
                     findBestOrientation(
@@ -282,6 +298,93 @@ public class PackingService {
         }
 
         return results;
+    }
+
+    /**
+     * A bag can be large enough for each selected item on its own but still
+     * lack the combined usable volume. Preserve the request order so the item
+     * the user just added becomes the one reported as unavailable.
+     */
+    private List<EvaluatedItem> applyCombinedCapacity(
+            List<EvaluatedItem> evaluatedItems,
+            double usableBagVolume
+    ) {
+        List<EvaluatedItem> result = new ArrayList<>();
+        double occupiedVolume = 0;
+
+        for (EvaluatedItem evaluated : evaluatedItems) {
+            if (!evaluated.fit()) {
+                result.add(evaluated);
+                continue;
+            }
+
+            double nextVolume = occupiedVolume + evaluated.item().volume();
+            if (nextVolume > usableBagVolume) {
+                result.add(new EvaluatedItem(
+                        evaluated.item(),
+                        false,
+                        false,
+                        null,
+                        "이미 선택한 물건과 함께 넣으면 예상 수납 공간을 초과합니다."
+                ));
+                continue;
+            }
+
+            boolean tight = evaluated.tight()
+                    || nextVolume / usableBagVolume >= 0.75;
+            String reason = tight
+                    ? "수납은 가능하지만 남은 공간이 적습니다."
+                    : evaluated.reason();
+
+            result.add(new EvaluatedItem(
+                    evaluated.item(),
+                    true,
+                    tight,
+                    evaluated.orientation(),
+                    reason
+            ));
+            occupiedVolume = nextVolume;
+        }
+
+        return result;
+    }
+
+    private String deviceCompatibilityReason(
+            PackingItemDefinition item,
+            PackingProfile profile
+    ) {
+
+        return switch (item.code()) {
+
+            case "LAPTOP_13" ->
+                    !Boolean.TRUE.equals(
+                            profile.laptopSupported()
+                    )
+                            ? "이 가방은 노트북 수납을 지원하는 프로필이 아닙니다."
+                            : profile.laptopMaxInches() != null
+                            && profile.laptopMaxInches() < 13
+                            ? "공식 노트북 수납 한도를 초과합니다."
+                            : null;
+
+            case "LAPTOP_15" ->
+                    !Boolean.TRUE.equals(
+                            profile.laptopSupported()
+                    )
+                            ? "이 가방은 노트북 수납을 지원하는 프로필이 아닙니다."
+                            : profile.laptopMaxInches() == null
+                            || profile.laptopMaxInches() < 15
+                            ? "공식 노트북 수납 한도를 초과합니다."
+                            : null;
+
+            case "TABLET_11" ->
+                    !Boolean.TRUE.equals(
+                            profile.tabletSupported()
+                    )
+                            ? "이 가방은 태블릿 수납을 지원하는 프로필이 아닙니다."
+                            : null;
+
+            default -> null;
+        };
     }
 
     /**
@@ -435,89 +538,31 @@ public class PackingService {
      */
     private List<PackingCheckResponse.Placement> buildPlacements(
             List<EvaluatedItem> evaluatedItems,
-            ProductDimensionExtractor.BagDimensions bag
+            BagDimensions bag
     ) {
 
-        List<PackingCheckResponse.Placement> result =
-                new ArrayList<>();
+        List<PackingLayoutEngine.LayoutItem> layoutItems =
+                evaluatedItems.stream()
+                        .filter(EvaluatedItem::fit)
+                        .map(item ->
+                                new PackingLayoutEngine.LayoutItem(
+                                        item.item().code(),
+                                        item.item().name(),
+                                        // The fit calculation may rotate an item in depth,
+                                        // but the X-ray is a front-facing visual. Keep the
+                                        // product's native width and height here so a laptop,
+                                        // book, and phone retain their real screen proportion.
+                                        item.item().widthMm(),
+                                        item.item().heightMm()
+                                )
+                        )
+                        .toList();
 
-        double x = 5;
-        double y = 5;
-
-        double currentRowHeight = 0;
-
-        for (EvaluatedItem evaluated : evaluatedItems) {
-
-            if (!evaluated.fit()
-                    || evaluated.orientation() == null) {
-
-                continue;
-            }
-
-            Orientation orientation =
-                    evaluated.orientation();
-
-            double widthPercent =
-                    orientation.widthMm()
-                            / bag.widthMm()
-                            * 82;
-
-            double heightPercent =
-                    orientation.heightMm()
-                            / bag.heightMm()
-                            * 82;
-
-            widthPercent =
-                    clamp(
-                            widthPercent,
-                            12,
-                            82
-                    );
-
-            heightPercent =
-                    clamp(
-                            heightPercent,
-                            10,
-                            72
-                    );
-
-            if (x + widthPercent > 95) {
-
-                x = 5;
-                y += currentRowHeight + 4;
-                currentRowHeight = 0;
-            }
-
-            if (y + heightPercent > 95) {
-
-                y = Math.max(
-                        5,
-                        95 - heightPercent
-                );
-            }
-
-            result.add(
-                    new PackingCheckResponse.Placement(
-                            evaluated.item().code(),
-                            evaluated.item().name(),
-                            round(x),
-                            round(y),
-                            round(widthPercent),
-                            round(heightPercent),
-                            0
-                    )
-            );
-
-            x += widthPercent + 4;
-
-            currentRowHeight =
-                    Math.max(
-                            currentRowHeight,
-                            heightPercent
-                    );
-        }
-
-        return result;
+        return packingLayoutEngine.layout(
+                layoutItems,
+                bag.widthMm(),
+                bag.heightMm()
+        );
     }
 
     private String buildNotice(
@@ -540,21 +585,6 @@ public class PackingService {
         };
     }
 
-    private double clamp(
-            double value,
-            double min,
-            double max
-    ) {
-
-        return Math.max(
-                min,
-                Math.min(
-                        max,
-                        value
-                )
-        );
-    }
-
     private double round(double value) {
 
         return Math.round(
@@ -567,6 +597,25 @@ public class PackingService {
             double heightMm,
             double depthMm
     ) {
+    }
+
+    private record BagDimensions(
+            double widthMm,
+            double heightMm,
+            double depthMm
+    ) {
+
+        private static BagDimensions from(PackingProfile profile) {
+            return new BagDimensions(
+                    profile.widthCm() * 10,
+                    profile.heightCm() * 10,
+                    profile.depthCm() * 10
+            );
+        }
+
+        private double volume() {
+            return widthMm * heightMm * depthMm;
+        }
     }
 
     private record EvaluatedItem(

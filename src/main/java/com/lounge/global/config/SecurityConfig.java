@@ -67,6 +67,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",         // Swagger
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
+                                "/packing-assets/**",
 
                                 "/api/auth/signup",
                                 "/api/auth/login",

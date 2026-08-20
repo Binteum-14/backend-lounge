@@ -6,11 +6,19 @@ import java.util.List;
 
 public record PackingCheckResponse(
 
-        Long productId,
+        String loungeId,
+
+        String scene,
+
+        String sku,
 
         String productName,
 
-        String productImageUrl,
+        String color,
+
+        String imagePath,
+
+        String imageUrl,
 
         PackingStatus status,
 
@@ -24,7 +32,9 @@ public record PackingCheckResponse(
 
         List<Placement> placements,
 
-        String notice
+        String notice,
+
+        String sourceUrl
 ) {
 
     public record BagSize(

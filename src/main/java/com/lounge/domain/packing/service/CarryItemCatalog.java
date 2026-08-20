@@ -28,7 +28,7 @@ public class CarryItemCatalog {
 
         register(new PackingItemDefinition(
                 "CARD_WALLET",
-                "반지갑",
+                "지갑",
                 "DAILY",
                 110,
                 90,
@@ -134,6 +134,76 @@ public class CarryItemCatalog {
                 70,
                 20,
                 "일반 휴대용 보조배터리 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "BOOK_PAPERBACK",
+                "책",
+                "DAILY",
+                150,
+                225,
+                28,
+                "일반 단행본 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "SUNGLASSES_CASE",
+                "선글라스 케이스",
+                "DAILY",
+                165,
+                70,
+                50,
+                "일반 선글라스 케이스 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "USB_C_CHARGER",
+                "충전기",
+                "DIGITAL",
+                65,
+                65,
+                32,
+                "USB-C 충전 어댑터 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "CHARGING_CABLE",
+                "충전 케이블",
+                "DIGITAL",
+                100,
+                80,
+                28,
+                "케이블을 정리한 상태 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "EARBUDS_CASE",
+                "무선 이어폰",
+                "DIGITAL",
+                65,
+                55,
+                30,
+                "무선 이어폰 충전 케이스 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "PASSPORT",
+                "여권",
+                "TRAVEL",
+                125,
+                88,
+                12,
+                "대한민국 여권 크기 기준"
+        ));
+
+        register(new PackingItemDefinition(
+                "KEY_CASE",
+                "키 케이스",
+                "DAILY",
+                110,
+                70,
+                30,
+                "차 키를 포함한 키 케이스 기준"
         ));
     }
 
