@@ -35,7 +35,7 @@ class SnackServiceTest {
 
     @ParameterizedTest
     @EnumSource(SnackType.class)
-    void mapsEachMenuCategoryToTheSameLoungeAndFlightSet(
+    void mapsEveryMenuCategoryToItsOwnPackingBag(
             SnackType snackType
     ) {
         Snack first = snack(1L);
@@ -61,11 +61,18 @@ class SnackServiceTest {
                 .thenReturn(Optional.of(fourth));
         when(snackSetRepository.findBySnack_Id(4L))
                 .thenReturn(Optional.of(snackSet));
-        when(snackRepository.findByTypeOrderByIdAsc(snackType))
+        when(snackRepository.findByTypeAndActiveTrueOrderByIdAsc(snackType))
                 .thenReturn(menu);
 
         SnackDetailResponse response = snackService.getSnack(4L);
 
+        String expectedPackingProfileId = switch (snackType) {
+            case SNACK -> "L04";
+            case DRINK -> "F04";
+            case PERFUME -> "P04";
+        };
+        assertThat(response.getPackingProfileId())
+                .isEqualTo(expectedPackingProfileId);
         assertThat(response.getLoungePackingProfileId()).isEqualTo("L04");
         assertThat(response.getFlightPackingProfileId()).isEqualTo("F04");
     }

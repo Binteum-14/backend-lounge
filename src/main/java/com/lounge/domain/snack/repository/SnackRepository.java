@@ -11,7 +11,7 @@ public interface SnackRepository extends JpaRepository<Snack, Long> {
 
     List<Snack> findByActiveTrueOrderByIdAsc();
 
-    List<Snack> findByTypeOrderByIdAsc(SnackType type);
+    List<Snack> findByTypeAndActiveTrueOrderByIdAsc(SnackType type);
 
     Optional<Snack> findByIdAndActiveTrue(Long id);
 }

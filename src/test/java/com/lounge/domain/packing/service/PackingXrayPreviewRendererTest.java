@@ -34,7 +34,7 @@ class PackingXrayPreviewRendererTest {
     }
 
     @Test
-    void rendersEveryLoungeAndFlightBagWithItsOwnImage() {
+    void rendersEveryMenuBagWithItsOwnImage() {
         PackingProfileCatalog catalog = new PackingProfileCatalog(new ObjectMapper());
         PackingService packingService = new PackingService(
                 new CarryItemCatalog(),

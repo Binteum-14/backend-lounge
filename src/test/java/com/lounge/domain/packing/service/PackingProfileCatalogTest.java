@@ -13,13 +13,13 @@ class PackingProfileCatalogTest {
             new PackingProfileCatalog(new ObjectMapper());
 
     @Test
-    void loadsAllFourteenSceneProfiles() {
-        assertThat(catalog.findAll()).hasSize(14);
+    void loadsAllTwentyOneMenuProfiles() {
+        assertThat(catalog.findAll()).hasSize(21);
     }
 
     @Test
-    void findsProfileByLoungeIdAndSkuWithoutCaseSensitivity() {
-        PackingProfile profile = catalog.findByLoungeId("l01").orElseThrow();
+    void findsLoungeProfileByIdAndSkuWithoutCaseSensitivity() {
+        PackingProfile profile = catalog.findByPackingProfileId("l01").orElseThrow();
 
         assertThat(profile.sku()).isEqualTo("MMKEAVE14CO001");
         assertThat(catalog.findBySku("mmkeave14co001"))
@@ -30,11 +30,21 @@ class PackingProfileCatalogTest {
 
     @Test
     void findsFlightProfile() {
-        PackingProfile profile = catalog.findByLoungeId("F02").orElseThrow();
+        PackingProfile profile = catalog.findByPackingProfileId("F02").orElseThrow();
 
         assertThat(profile.scene()).isEqualTo("flight");
         assertThat(profile.getImageUrl())
                 .isEqualTo("/packing-assets/비행기/02_travia_quilted_shoulder_black.png");
+    }
+
+    @Test
+    void findsPerfumeProfileWithItsTransparentBundledImage() {
+        PackingProfile profile = catalog.findByPackingProfileId("P01").orElseThrow();
+
+        assertThat(profile.scene()).isEqualTo("perfume");
+        assertThat(profile.sku()).isEqualTo("MYZGATA05CO001");
+        assertThat(profile.getImageUrl())
+                .isEqualTo("/packing-assets/향수/01_mini_aren_triangle_crossbody_cognac.png");
     }
 
     @Test
