@@ -5,6 +5,7 @@ import com.lounge.global.api.code.GeneralErrorCode;
 import com.lounge.global.config.properties.JwtProperties;
 import com.lounge.global.exception.GeneralException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -131,6 +132,12 @@ public class JwtProvider {
         try {
 
             parseClaims(token);
+
+        } catch (ExpiredJwtException exception) {
+
+            throw new GeneralException(
+                    GeneralErrorCode.TOKEN_EXPIRED
+            );
 
         } catch (
                 JwtException

@@ -1,7 +1,5 @@
 package com.lounge.global.security.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lounge.global.api.ApiResponse;
 import com.lounge.global.exception.GeneralException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -35,8 +33,6 @@ public class JwtAuthenticationFilter
 
     private final JwtProvider jwtProvider;
 
-    private final ObjectMapper objectMapper;
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
@@ -55,10 +51,6 @@ public class JwtAuthenticationFilter
                         AUTHORIZATION_HEADER
                 );
 
-        /*
-         * 토큰 자체가 없는 경우:
-         * Spring Security 다음 필터로 넘김
-         */
         if (authorizationHeader == null
                 || !authorizationHeader
                 .startsWith(
@@ -80,11 +72,6 @@ public class JwtAuthenticationFilter
 
         try {
 
-            /*
-             * 핵심:
-             * validateToken이 아니라
-             * validateAccessToken을 사용
-             */
             jwtProvider.validateAccessToken(
                     token
             );
@@ -111,36 +98,19 @@ public class JwtAuthenticationFilter
                             authentication
                     );
 
-            filterChain.doFilter(
-                    request,
-                    response
-            );
-
         } catch (GeneralException exception) {
 
-            /*
-             * 잘못된 JWT가 들어왔으면
-             * SecurityContext에 인증 정보가 남지 않도록 초기화
-             */
             SecurityContextHolder
                     .clearContext();
-
-            response.setStatus(
-                    exception.getReason()
-                            .getHttpStatus()
-                            .value()
-            );
-
-            response.setContentType(
-                    "application/json;charset=UTF-8"
-            );
-
-            objectMapper.writeValue(
-                    response.getWriter(),
-                    ApiResponse.onFailure(
-                            exception.getCode()
-                    )
+            request.setAttribute(
+                    JwtAuthenticationEntryPoint.JWT_EXCEPTION_ATTRIBUTE,
+                    exception
             );
         }
+
+        filterChain.doFilter(
+                request,
+                response
+        );
     }
 }
