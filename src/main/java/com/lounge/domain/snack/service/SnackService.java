@@ -41,6 +41,37 @@ public class SnackService {
             throw SnackException.of(SnackErrorCode.SNACK_PRODUCT_NOT_FOUND);
         }
 
-        return SnackDetailResponse.of(snack, productVariant);
+        int menuOrder = getMenuOrder(snack);
+        String loungePackingProfileId = "L%02d".formatted(menuOrder);
+        String flightPackingProfileId = "F%02d".formatted(menuOrder);
+
+        return SnackDetailResponse.of(
+                snack,
+                productVariant,
+                loungePackingProfileId,
+                flightPackingProfileId
+        );
+    }
+
+    /**
+     * The focus-mode dataset pairs drink, dessert, and fragrance menus by
+     * their order: each category's 1st item maps to L01/F01, and so on.
+     */
+    private int getMenuOrder(Snack snack) {
+        List<Snack> snacksOfSameType = snackRepository
+                .findByTypeOrderByIdAsc(snack.getType());
+
+        int index = snacksOfSameType.stream()
+                .map(Snack::getId)
+                .toList()
+                .indexOf(snack.getId());
+
+        if (index < 0 || index >= 7) {
+            throw new IllegalStateException(
+                    "수납 프로필에 연결할 수 없는 메뉴입니다: " + snack.getId()
+            );
+        }
+
+        return index + 1;
     }
 }
