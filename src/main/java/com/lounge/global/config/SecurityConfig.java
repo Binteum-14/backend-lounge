@@ -1,7 +1,8 @@
 package com.lounge.global.config;
 
+import com.lounge.global.security.jwt.JwtAccessDeniedHandler;
+import com.lounge.global.security.jwt.JwtAuthenticationEntryPoint;
 import com.lounge.global.security.jwt.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,8 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     @Value("${CORS_ALLOWED_ORIGINS:http://localhost:3000}")
     private String allowedOrigins;
 
@@ -52,12 +55,8 @@ public class SecurityConfig {
 
                 // 인증 안 된 사용자가 호출했을 때
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, e) -> {
-                            response.setContentType("application/json;charset=UTF-8");
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write(
-                                    "{\"isSuccess\":false,\"code\":\"JWT_401\",\"message\":\"인증이 필요합니다.\"}");
-                        })
+                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                        .accessDeniedHandler(jwtAccessDeniedHandler)
                 )
                 // 인증 및 권한 설정
                 .authorizeHttpRequests(auth -> auth
