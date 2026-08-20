@@ -29,9 +29,19 @@ public class JwtAuthenticationFilter
     private static final String BEARER_PREFIX =
             "Bearer ";
 
+    private static final String LOGIN_PATH = "/api/auth/login";
+
+    private static final String SIGNUP_PATH = "/api/auth/signup";
+
     private final JwtProvider jwtProvider;
 
     private final ObjectMapper objectMapper;
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return LOGIN_PATH.equals(path) || SIGNUP_PATH.equals(path);
+    }
 
     @Override
     protected void doFilterInternal(
