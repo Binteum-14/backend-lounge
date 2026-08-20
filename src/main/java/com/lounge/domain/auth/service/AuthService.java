@@ -8,6 +8,7 @@ import com.lounge.domain.auth.exception.code.AuthErrorCode;
 import com.lounge.domain.diagnosis.repository.DiagnosisRepository;
 import com.lounge.domain.flightfocusdetail.repository.FlightFocusDetailRepository;
 import com.lounge.domain.focusrecord.repository.FocusRecordRepository;
+import com.lounge.domain.ownerproduct.repository.OwnedProductRepository;
 import com.lounge.domain.recommendation.repository.RecommendationRepository;
 import com.lounge.domain.user.entity.User;
 import com.lounge.domain.user.repository.UserRepository;
@@ -32,6 +33,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
     private final FlightFocusDetailRepository flightFocusDetailRepository;
+    private final OwnedProductRepository ownedProductRepository;
     private final FocusRecordRepository focusRecordRepository;
     private final DiagnosisRepository diagnosisRepository;
     private final RecommendationRepository recommendationRepository;
@@ -108,6 +110,7 @@ public class AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> GeneralException.of(GeneralErrorCode.USER_NOT_FOUND));
 
+        ownedProductRepository.deleteByUser_Id(userId);
         flightFocusDetailRepository.deleteByFocusRecord_User_Id(userId);
         focusRecordRepository.deleteByUser_Id(userId);
         recommendationRepository.detachUser(userId);

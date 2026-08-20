@@ -1,5 +1,8 @@
 package com.lounge.global.security.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lounge.global.api.ApiResponse;
+import com.lounge.global.exception.GeneralException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,15 +18,20 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.List;
 
-// 요청마다 Authorization 헤더 읽는 필터
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter
+        extends OncePerRequestFilter {
 
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String BEARER_PREFIX = "Bearer ";
+    private static final String AUTHORIZATION_HEADER =
+            "Authorization";
+
+    private static final String BEARER_PREFIX =
+            "Bearer ";
 
     private final JwtProvider jwtProvider;
+
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(
@@ -32,35 +40,97 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // 1. Authorization 헤더 추출
-        String authorizationHeader = request.getHeader(AUTHORIZATION_HEADER);
+        String authorizationHeader =
+                request.getHeader(
+                        AUTHORIZATION_HEADER
+                );
 
-        // 2. Bearer 토큰이 없으면 다음 필터로 이동
-        if (authorizationHeader == null || !authorizationHeader.startsWith(BEARER_PREFIX)) {
-            filterChain.doFilter(request, response);
+        /*
+         * 토큰 자체가 없는 경우:
+         * Spring Security 다음 필터로 넘김
+         */
+        if (authorizationHeader == null
+                || !authorizationHeader
+                .startsWith(
+                        BEARER_PREFIX
+                )) {
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
             return;
         }
 
-        // 3. Bearer 제거 후 토큰 추출
-        String token = authorizationHeader.substring(BEARER_PREFIX.length());
+        String token =
+                authorizationHeader.substring(
+                        BEARER_PREFIX.length()
+                );
 
-        // 4. 토큰 검증
-        jwtProvider.validateToken(token);
+        try {
 
-        // 5. 토큰에서 userId 추출
-        Long userId = jwtProvider.getUserId(token);
+            /*
+             * 핵심:
+             * validateToken이 아니라
+             * validateAccessToken을 사용
+             */
+            jwtProvider.validateAccessToken(
+                    token
+            );
 
-        // 6. 인증 객체 생성
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userId,
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
+            Long userId =
+                    jwtProvider.getUserId(
+                            token
+                    );
 
-        // 7. SecurityContext 에 인증 정보 저장
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            Authentication authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            userId,
+                            null,
+                            List.of(
+                                    new SimpleGrantedAuthority(
+                                            "ROLE_USER"
+                                    )
+                            )
+                    );
 
-        // 8. 다음 필터로 이동
-        filterChain.doFilter(request, response);
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(
+                            authentication
+                    );
+
+            filterChain.doFilter(
+                    request,
+                    response
+            );
+
+        } catch (GeneralException exception) {
+
+            /*
+             * 잘못된 JWT가 들어왔으면
+             * SecurityContext에 인증 정보가 남지 않도록 초기화
+             */
+            SecurityContextHolder
+                    .clearContext();
+
+            response.setStatus(
+                    exception.getReason()
+                            .getHttpStatus()
+                            .value()
+            );
+
+            response.setContentType(
+                    "application/json;charset=UTF-8"
+            );
+
+            objectMapper.writeValue(
+                    response.getWriter(),
+                    ApiResponse.onFailure(
+                            exception.getCode()
+                    )
+            );
+        }
     }
 }
