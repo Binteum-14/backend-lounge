@@ -56,4 +56,24 @@ class PackingXrayPreviewRendererTest {
                     .contains("data:image/png;base64,");
         }
     }
+
+    @Test
+    void namesTheItemThatMustBeExcludedInsteadOfCallingTheWholeBagUnusable() {
+        PackingService packingService = new PackingService(
+                new CarryItemCatalog(),
+                new PackingProfileCatalog(new ObjectMapper()),
+                new PackingLayoutEngine()
+        );
+        PackingCheckResponse response = packingService.check(
+                "L02",
+                new PackingCheckRequest(List.of(
+                        "SMARTPHONE", "CARD_WALLET", "BOOK_PAPERBACK"
+                ))
+        );
+
+        String svg = new PackingXrayPreviewRenderer().render(response);
+
+        assertThat(svg).contains("일부 물품 제외 필요");
+        assertThat(svg).contains("책 제외 필요");
+    }
 }

@@ -62,6 +62,46 @@ class PackingServiceTest {
     }
 
     @Test
+    void smartphoneFitsInEverySupportedPackingBag() {
+        packingService.getAvailableProfiles().forEach(profile -> {
+            PackingCheckResponse response = packingService.check(
+                    profile.loungeId(),
+                    new PackingCheckRequest(List.of("SMARTPHONE"))
+            );
+
+            assertThat(response.items())
+                    .as(profile.loungeId() + " should fit a smartphone")
+                    .allMatch(PackingCheckResponse.ItemResult::fit);
+        });
+    }
+
+    @Test
+    void everydayEssentialsFitInEverySupportedPackingBag() {
+        packingService.getAvailableProfiles().forEach(profile -> {
+            PackingCheckResponse response = packingService.check(
+                    profile.loungeId(),
+                    new PackingCheckRequest(List.of(
+                            "SMARTPHONE", "CARD_WALLET", "POUCH"
+                    ))
+            );
+
+            assertThat(response.items())
+                    .as(profile.loungeId() + " should fit everyday essentials")
+                    .allMatch(PackingCheckResponse.ItemResult::fit);
+        });
+    }
+
+    @Test
+    void recommendedPackingUsesOnlyItemsThatFitTheBag() {
+        PackingCheckResponse response = packingService.recommend("L02");
+
+        assertThat(response.items()).hasSizeGreaterThanOrEqualTo(4);
+        assertThat(response.items()).allMatch(PackingCheckResponse.ItemResult::fit);
+        assertThat(response.usedSpaceRatio()).isGreaterThanOrEqualTo(0.55);
+        assertThat(response.usedSpaceRatio()).isLessThan(0.75);
+    }
+
+    @Test
     void selectedItemsChangeThePackingResultAndIncludeEverySelectedItem() {
         PackingCheckResponse lightPacking = packingService.check(
                 "L01",
