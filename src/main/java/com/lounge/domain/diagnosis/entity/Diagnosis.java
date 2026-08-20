@@ -44,6 +44,14 @@ public class Diagnosis extends CreatedAtEntity {
     @OneToMany(mappedBy = "diagnosis")
     private List<Recommendation> recommendations = new ArrayList<>();
 
+    public static Diagnosis create(User user) {
+        return new Diagnosis(user);
+    }
+
+    private Diagnosis(User user) {
+        this.user = user;
+    }
+
     public void updateResultSummary(String resultSummary) {
         this.resultSummary = resultSummary;
     }

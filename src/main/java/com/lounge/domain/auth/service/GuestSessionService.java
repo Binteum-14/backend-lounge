@@ -70,9 +70,7 @@ public class GuestSessionService {
                     .set(
                             GUEST_SESSION_KEY_PREFIX
                                     + resolvedSessionId,
-
                             ACTIVE_VALUE,
-
                             Duration.ofMillis(
                                     guestSessionExpiration
                             )
@@ -82,6 +80,58 @@ public class GuestSessionService {
         return GuestSessionResponse.of(
                 resolvedSessionId,
                 guestSessionExpiration / 1000
+        );
+    }
+
+    public boolean exists(
+            String guestSessionId
+    ) {
+
+        if (!StringUtils.hasText(
+                guestSessionId
+        )) {
+
+            return false;
+        }
+
+        /*
+         * local 환경
+         */
+        if (isLocalProfile()) {
+
+            Long expiresAt =
+                    localGuestSessions.get(
+                            guestSessionId
+                    );
+
+            if (expiresAt == null) {
+                return false;
+            }
+
+            /*
+             * 세션이 만료된 경우
+             */
+            if (expiresAt
+                    <= System.currentTimeMillis()) {
+
+                localGuestSessions.remove(
+                        guestSessionId
+                );
+
+                return false;
+            }
+
+            return true;
+        }
+
+        /*
+         * prod 환경
+         */
+        return Boolean.TRUE.equals(
+                stringRedisTemplate.hasKey(
+                        GUEST_SESSION_KEY_PREFIX
+                                + guestSessionId
+                )
         );
     }
 
@@ -96,6 +146,9 @@ public class GuestSessionService {
             return;
         }
 
+        /*
+         * local 환경
+         */
         if (isLocalProfile()) {
 
             localGuestSessions.remove(
@@ -105,6 +158,9 @@ public class GuestSessionService {
             return;
         }
 
+        /*
+         * prod 환경
+         */
         stringRedisTemplate.delete(
                 GUEST_SESSION_KEY_PREFIX
                         + guestSessionId
@@ -127,55 +183,18 @@ public class GuestSessionService {
         }
 
         /*
-         * local 환경
+         * 기존 세션이 아직 유효하면 재사용
          */
-        if (isLocalProfile()) {
-
-            Long expiresAt =
-                    localGuestSessions.get(
-                            guestSessionId
-                    );
-
-            /*
-             * 아직 유효한 기존 세션
-             */
-            if (expiresAt != null
-                    && expiresAt
-                    > System.currentTimeMillis()) {
-
-                return guestSessionId;
-            }
-
-            /*
-             * 만료된 세션이면 제거
-             */
-            if (expiresAt != null) {
-
-                localGuestSessions.remove(
-                        guestSessionId
-                );
-            }
-
-            return UUID.randomUUID()
-                    .toString();
-        }
-
-        /*
-         * prod 환경에서는 기존 Redis 사용
-         */
-        Boolean exists =
-                stringRedisTemplate.hasKey(
-                        GUEST_SESSION_KEY_PREFIX
-                                + guestSessionId
-                );
-
-        if (Boolean.TRUE.equals(
-                exists
+        if (exists(
+                guestSessionId
         )) {
 
             return guestSessionId;
         }
 
+        /*
+         * 존재하지 않거나 만료된 세션이면 새로 발급
+         */
         return UUID.randomUUID()
                 .toString();
     }

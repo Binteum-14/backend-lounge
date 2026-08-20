@@ -155,9 +155,11 @@ public class VisitPassService {
                 answer.getQuestionNo(),
                 answer.getQuestionCode()
         );
-        String answerText = answer.getAnswerText() == null || answer.getAnswerText().isBlank()
-                ? answer.getAnswerCode()
-                : answer.getAnswerText();
+        String answerText = DiagnosisQuestionCatalog.answerText(
+                answer.getQuestionNo(),
+                answer.getAnswerCode(),
+                answer.getAnswerText()
+        );
 
         return new AnswerView(questionText, answerText);
     }

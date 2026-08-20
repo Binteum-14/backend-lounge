@@ -61,7 +61,6 @@ public class FocusRecordService {
                 request.getThemeType(),
                 request.getAllMinutes(),
                 request.getStudySeconds(),
-                request.getBreakSeconds(),
                 request.getStartedAt(),
                 request.getEndedAt()
         );

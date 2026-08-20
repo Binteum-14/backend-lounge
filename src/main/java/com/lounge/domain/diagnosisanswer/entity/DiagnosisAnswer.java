@@ -39,4 +39,34 @@ public class DiagnosisAnswer {
 
     @Column(name = "answer_text")
     private String answerText;
+
+    private DiagnosisAnswer(
+            Diagnosis diagnosis,
+            Integer questionNo,
+            String questionCode,
+            String answerCode,
+            String answerText
+    ) {
+        this.diagnosis = diagnosis;
+        this.questionNo = questionNo;
+        this.questionCode = questionCode;
+        this.answerCode = answerCode;
+        this.answerText = answerText;
+    }
+
+    public static DiagnosisAnswer create(
+            Diagnosis diagnosis,
+            Integer questionNo,
+            String questionCode,
+            String answerCode,
+            String answerText
+    ) {
+        return new DiagnosisAnswer(
+                diagnosis,
+                questionNo,
+                questionCode,
+                answerCode,
+                answerText
+        );
+    }
 }
