@@ -249,6 +249,7 @@ public class PackingXrayPreviewRenderer {
 
     private void appendResultPanel(StringBuilder svg, PackingCheckResponse response) {
         String statusColor = statusColor(response.status());
+        String statusDetail = statusDetail(response);
         double usedWidth = 196 * Math.min(1, response.usedSpaceRatio());
         double fitWidth = 196 * response.fitScore() / 100.0;
         svg.append("""
@@ -270,8 +271,18 @@ public class PackingXrayPreviewRenderer {
                 """.formatted(
                 escape(response.productName()), response.usedSpaceRatio() * 100, number(usedWidth),
                 response.fitScore(), number(fitWidth), statusColor, escape(statusLabel(response.status())),
-                escape(response.scene().equals("flight") ? "Flight baggage profile" : "Lounge baggage profile")
+                escape(statusDetail)
         ));
+    }
+
+    private String statusDetail(PackingCheckResponse response) {
+        return response.items().stream()
+                .filter(item -> !item.fit())
+                .map(item -> item.itemName() + " 제외 필요")
+                .findFirst()
+                .orElseGet(() -> response.scene().equals("flight")
+                        ? "Flight baggage profile"
+                        : "Lounge baggage profile");
     }
 
     private void appendSpaceUsed(StringBuilder svg, PackingCheckResponse response) {
@@ -516,7 +527,7 @@ public class PackingXrayPreviewRenderer {
         return switch (status) {
             case COMFORTABLE -> "여유 있음";
             case TIGHT -> "공간 빠듯";
-            case NOT_RECOMMENDED -> "수납 비추천";
+            case NOT_RECOMMENDED -> "일부 물품 제외 필요";
             case PROFILE_UNAVAILABLE -> "분석 불가";
         };
     }
