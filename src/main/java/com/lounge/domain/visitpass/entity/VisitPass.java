@@ -86,4 +86,8 @@ public class VisitPass extends CreatedAtEntity {
                 qrCodeUrl
         );
     }
+
+    public void updateQrCodeUrl(String qrCodeUrl) {
+        this.qrCodeUrl = qrCodeUrl;
+    }
 }
