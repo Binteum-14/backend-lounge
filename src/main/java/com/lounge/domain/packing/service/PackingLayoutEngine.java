@@ -51,7 +51,7 @@ public class PackingLayoutEngine {
         return List.copyOf(placements);
     }
 
-    private double visualScaleFor(int itemCount) {
+    static double visualScaleFor(int itemCount) {
         return Math.max(40, 70 - Math.max(0, itemCount - 1) * 3.4);
     }
 

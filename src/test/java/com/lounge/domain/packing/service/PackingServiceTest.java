@@ -46,6 +46,29 @@ class PackingServiceTest {
             assertThat(item.reason()).contains("노트북 수납");
         });
         assertThat(response.placements()).isEmpty();
+        assertThat(response.usedSpaceRatio()).isZero();
+        assertThat(response.fitScore()).isZero();
+    }
+
+    @Test
+    void exposesFourteenInchLaptopInsteadOfTheOldFifteenInchOption() {
+        PackingCheckResponse smallBackpack = packingService.check(
+                "L01",
+                new PackingCheckRequest(List.of("LAPTOP_14"))
+        );
+        PackingCheckResponse largeTote = packingService.check(
+                "P07",
+                new PackingCheckRequest(List.of("LAPTOP_14"))
+        );
+
+        assertThat(packingService.getAvailableItems())
+                .extracting(item -> item.code())
+                .contains("LAPTOP_14")
+                .doesNotContain("LAPTOP_15");
+        assertThat(smallBackpack.items()).singleElement()
+                .satisfies(item -> assertThat(item.fit()).isFalse());
+        assertThat(largeTote.items()).singleElement()
+                .satisfies(item -> assertThat(item.fit()).isTrue());
     }
 
     @Test
@@ -172,5 +195,22 @@ class PackingServiceTest {
         assertThat(response.placements())
                 .extracting(PackingCheckResponse.Placement::itemCode)
                 .contains("POUCH");
+    }
+
+    @Test
+    void verifiesTheElevenInchTabletAgainstActualBagDimensions() {
+        PackingCheckResponse largeShopper = packingService.check(
+                "L03",
+                new PackingCheckRequest(List.of("TABLET_11"))
+        );
+        PackingCheckResponse extraMiniShopper = packingService.check(
+                "L07",
+                new PackingCheckRequest(List.of("TABLET_11"))
+        );
+
+        assertThat(largeShopper.items()).singleElement()
+                .satisfies(item -> assertThat(item.fit()).isTrue());
+        assertThat(extraMiniShopper.items()).singleElement()
+                .satisfies(item -> assertThat(item.fit()).isFalse());
     }
 }

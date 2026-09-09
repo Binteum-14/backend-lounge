@@ -1,5 +1,6 @@
 package com.lounge.domain.product.service;
 
+import com.lounge.domain.packing.service.PackingProfileCatalog;
 import com.lounge.domain.product.dto.response.ProductListResponse;
 import com.lounge.domain.product.dto.response.ProductResponse;
 import com.lounge.domain.product.exception.ProductException;
@@ -19,6 +20,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final PackingProfileCatalog packingProfileCatalog;
 
     public List<ProductListResponse> getProducts() {
         return productRepository.findTop3ByOrderByIdAsc().stream()
@@ -28,7 +30,10 @@ public class ProductService {
 
     public ProductResponse getProductByVariantId(Long productVariantId) {
         return productVariantRepository.findById(productVariantId)
-                .map(ProductResponse::from)
+                .map(productVariant -> ProductResponse.from(
+                        productVariant,
+                        packingProfileCatalog.findBySku(productVariant.getSku()).orElse(null)
+                ))
                 .orElseThrow(() -> ProductException.of(ProductErrorCode.PRODUCT_NOT_FOUND));
     }
 }

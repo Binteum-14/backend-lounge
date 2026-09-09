@@ -40,10 +40,10 @@ public class CarryItemCatalog {
                 "POUCH",
                 "파우치",
                 "DAILY",
-                150,
-                90,
-                35,
-                "슬림 데일리 파우치 기준"
+                120,
+                80,
+                25,
+                "컴팩트 데일리 파우치 기준"
         ));
 
         register(new PackingItemDefinition(
@@ -67,13 +67,13 @@ public class CarryItemCatalog {
         ));
 
         register(new PackingItemDefinition(
-                "LAPTOP_15",
-                "15인치 노트북",
+                "LAPTOP_14",
+                "14인치 노트북",
                 "DIGITAL",
-                360,
-                245,
-                18,
-                "15인치급 노트북 기준"
+                320,
+                225,
+                17,
+                "14인치급 노트북 기준"
         ));
 
         register(new PackingItemDefinition(
