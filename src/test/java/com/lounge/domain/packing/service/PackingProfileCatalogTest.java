@@ -5,6 +5,8 @@ import com.lounge.domain.packing.dto.PackingProfile;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PackingProfileCatalogTest {
@@ -18,11 +20,47 @@ class PackingProfileCatalogTest {
     }
 
     @Test
+    void resolvesEverySupportedProductSkuToItsOwnPackingProfile() {
+        Map<String, String> expectedProfileIdBySku = Map.ofEntries(
+                Map.entry("MMKEAVE12CO001", "L01"),
+                Map.entry("MWPAATN04BK001", "L02"),
+                Map.entry("MWPFSLR03K8001", "L03"),
+                Map.entry("MMVGATT01PZ001", "L04"),
+                Map.entry("MWSGATA01I8001", "L05"),
+                Map.entry("MMKEAVE12WT001", "L06"),
+                Map.entry("MWPGSMT03WT001", "L07"),
+                Map.entry("MWSEAAK01CK001", "F01"),
+                Map.entry("MWSCSLM02BK001", "F02"),
+                Map.entry("MWHFATA02I8001", "F03"),
+                Map.entry("MWRFAXT01PZ001", "F04"),
+                Map.entry("MWSESAC05DG001", "F05"),
+                Map.entry("MWSEAAK04WT001", "F06"),
+                Map.entry("MWRGSTA02CO001", "F07"),
+                Map.entry("MYZGATA05CO001", "P01"),
+                Map.entry("MMKEAVE05CO001", "P02"),
+                Map.entry("MYZGATA01BK001", "P03"),
+                Map.entry("MWKGATA03PZ001", "P04"),
+                Map.entry("MWDESAC03DG001", "P05"),
+                Map.entry("MWSFSAK01BK001", "P06"),
+                Map.entry("MMTGSTA01CO001", "P07")
+        );
+
+        assertThat(expectedProfileIdBySku).hasSize(21);
+        expectedProfileIdBySku.forEach((sku, packingProfileId) -> {
+            PackingProfile profile = catalog.findBySku(sku).orElseThrow();
+
+            assertThat(profile.getPackingProfileId()).isEqualTo(packingProfileId);
+            assertThat(catalog.findByPackingProfileId(packingProfileId))
+                    .containsSame(profile);
+        });
+    }
+
+    @Test
     void findsLoungeProfileByIdAndSkuWithoutCaseSensitivity() {
         PackingProfile profile = catalog.findByPackingProfileId("l01").orElseThrow();
 
-        assertThat(profile.sku()).isEqualTo("MMKEAVE14CO001");
-        assertThat(catalog.findBySku("mmkeave14co001"))
+        assertThat(profile.sku()).isEqualTo("MMKEAVE12CO001");
+        assertThat(catalog.findBySku("mmkeave12co001"))
                 .containsSame(profile);
         assertThat(profile.getImageUrl())
                 .isEqualTo("/packing-assets/라운지/01_stark_side_studded_visetos_backpack_cognac.png");

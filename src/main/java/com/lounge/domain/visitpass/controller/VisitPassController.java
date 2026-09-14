@@ -37,7 +37,7 @@ public class VisitPassController {
         );
     }
 
-    @Operation(summary = "방문 패스 목록 조회", description = "로그인한 사용자의 Visit Pass 목록과 QR 이미지 URL을 조회합니다.")
+    @Operation(summary = "방문 패스 목록 조회", description = "로그인한 사용자의 Visit Pass 목록과 QR 이미지 URL, 선택한 가방 이름/이미지를 조회합니다.")
     @GetMapping
     public ApiResponse<VisitPassListResponse> getVisitPasses(
             @AuthenticationPrincipal Long userId

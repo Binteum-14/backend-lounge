@@ -69,23 +69,6 @@ public class VisitPassService {
                 + "/visit-passes/public/" + publicToken;
         String objectKey = "visit-pass/qr/" + publicToken + ".png";
 
-        byte[] qrImageBytes;
-        try {
-            qrImageBytes = qrCodeGenerator.generatePng(qrTargetUrl);
-        } catch (IllegalStateException e) {
-            log.error("QR 이미지 생성 실패. qrTargetUrl={}", qrTargetUrl, e);
-            throw VisitPassException.of(VisitPassErrorCode.VISIT_PASS_QR_GENERATE_FAILED);
-        }
-
-        String qrImageUrl;
-        try {
-            qrImageUrl = s3Service.uploadQrCode(qrImageBytes, objectKey);
-        } catch (SdkException e) {
-            log.error("QR 이미지 S3 업로드 실패. objectKey={}, qrTargetUrl={}",
-                    objectKey, qrTargetUrl, e);
-            throw VisitPassException.of(VisitPassErrorCode.VISIT_PASS_QR_UPLOAD_FAILED);
-        }
-
         Diagnosis diagnosis = recommendation.getDiagnosis();
         LocalDate diagnosedAt = diagnosis.getCreatedAt().toLocalDate();
 
@@ -95,9 +78,18 @@ public class VisitPassService {
                         recommendationProduct,
                         publicToken,
                         diagnosedAt,
-                        qrImageUrl
+                        null
                 )
         );
+
+        try {
+            byte[] qrImageBytes = qrCodeGenerator.generatePng(qrTargetUrl);
+            String qrImageUrl = s3Service.uploadQrCode(qrImageBytes, objectKey);
+            visitPass.updateQrCodeUrl(qrImageUrl);
+        } catch (IllegalStateException | SdkException e) {
+            log.error("QR 이미지 생성 또는 S3 업로드 실패. objectKey={}, qrTargetUrl={}",
+                    objectKey, qrTargetUrl, e);
+        }
 
         return VisitPassResponse.from(visitPass);
     }
