@@ -67,6 +67,8 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/packing-assets/**",
+                                "/packing-simulator.html",
+                                "/api/packing/**",
 
                                 "/api/auth/signup",
                                 "/api/auth/login",

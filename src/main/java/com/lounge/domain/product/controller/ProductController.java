@@ -28,7 +28,11 @@ public class ProductController {
         return ApiResponse.onSuccess(ProductSuccessCode.PRODUCT_LIST_SUCCESS, productService.getProducts());
     }
 
-    @Operation(summary = "상품 상세 조회", description = "productVariantId로 상품 상세(이미지, 이름, 가격, 설명, 상세 URL)를 조회합니다.")
+    @Operation(
+            summary = "상품 상세 조회",
+            description = "productVariantId로 상품 상세와 해당 상품 SKU에 연결된 수납 프로필을 조회합니다. "
+                    + "수납 화면은 result.packingProfileId 또는 result.packingProfile을 그대로 사용해야 합니다."
+    )
     @GetMapping("/{productVariantId}")
     public ApiResponse<ProductResponse> getProductByVariantId(
             @PathVariable Long productVariantId

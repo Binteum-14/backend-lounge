@@ -226,7 +226,7 @@ public class PackingService {
                 "EARBUDS_CASE",
                 "TABLET_11",
                 "LAPTOP_13",
-                "LAPTOP_15"
+                "LAPTOP_14"
         );
     }
 
@@ -470,22 +470,20 @@ public class PackingService {
                             ? "공식 노트북 수납 한도를 초과합니다."
                             : null;
 
-            case "LAPTOP_15" ->
+            case "LAPTOP_14" ->
                     !Boolean.TRUE.equals(
                             profile.laptopSupported()
                     )
                             ? "이 가방은 노트북 수납을 지원하는 프로필이 아닙니다."
                             : profile.laptopMaxInches() == null
-                            || profile.laptopMaxInches() < 15
+                            || profile.laptopMaxInches() < 14
                             ? "공식 노트북 수납 한도를 초과합니다."
                             : null;
 
-            case "TABLET_11" ->
-                    !Boolean.TRUE.equals(
-                            profile.tabletSupported()
-                    )
-                            ? "이 가방은 태블릿 수납을 지원하는 프로필이 아닙니다."
-                            : null;
+            // Unlike a padded laptop sleeve, an 11-inch tablet does not need
+            // a model-specific slot. Its 250 × 180 × 7 mm footprint is
+            // verified by the same orientation and dimension check below.
+            case "TABLET_11" -> null;
 
             default -> null;
         };
@@ -587,6 +585,13 @@ public class PackingService {
             int notFitCount,
             int tightCount
     ) {
+
+        // A request where every selected item is excluded must not retain a
+        // seemingly positive score just because the bag itself is empty.
+        // It is a clear "cannot pack" result, not a 70% recommendation.
+        if (notFitCount > 0 && usedSpaceRatio == 0) {
+            return 0;
+        }
 
         double score = 100;
 
