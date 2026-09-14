@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface VisitPassRepository extends JpaRepository<VisitPass, Long> {
 
-    @EntityGraph(attributePaths = "user")
+    @EntityGraph(attributePaths = {"user", "recommendationProduct.product"})
     List<VisitPass> findAllByUser_IdOrderByIdDesc(Long userId);
 
     @Query("""
